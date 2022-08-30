@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { check } from 'express-validator'
-import { getUser, postUser, deleteUser } from '../controllers/users';
+import { getUser, postUser, deleteUser } from '../services/users';
 
 import { validarJWT, validarCampos} from '../middlewares'
 
