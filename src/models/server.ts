@@ -2,6 +2,7 @@ import express, { Application } from 'express'
 import cors from 'cors'
 
 import routerUsers from '../routes/users'
+import routerAuth from '../routes/auth'
 
 class Server{
     
@@ -41,6 +42,7 @@ class Server{
             res.json({msg:"re-pets api - conected"})
         })
         this.app.use(this.userPaths,routerUsers)
+        this.app.use(this.authPath,routerAuth)
     }
 
     listen(){

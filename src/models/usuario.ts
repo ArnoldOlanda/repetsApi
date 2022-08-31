@@ -1,10 +1,24 @@
 import {query} from '../database/config'
+import { UsuarioDef, VerifyAccountDef } from '../types';
 
 export default class {
-    static async registrar(_data = {}){
+    static async registrar(data: UsuarioDef){
         try {
-            //const {nombre, usuario, password_, idDireccion} = data
-            const rows = await query()
+            
+            const {nombre, apellido, celular, email, password, google, rol} = data
+            
+            const rows = await query(`
+                insert into usuario(nombre,apellido,celular,email,password,google,id_rol)
+                values(
+                    "${ nombre }",
+                    "${ apellido }",
+                    "${ celular }", 
+                    "${ email }", 
+                    "${ password }", 
+                    ${ google },
+                    ${ rol }
+                )`
+            );
 
             return rows
         } catch (error) {
@@ -13,10 +27,27 @@ export default class {
         }
     }
 
+    static async verificarCuenta( data: VerifyAccountDef ) {
+        try {
+            const {id, verified } = data
+
+            const rows = await query(`
+                update usuario set verificado = ${ Number( verified ) } where
+                id=${ id }
+            `)
+
+            return rows
+        } catch (error) {
+            
+            throw error
+                        
+        }
+    }
+
     static async listar(){
         try {
-            const rows = await query()
-            // const rows = await query("select * from usuario")
+            
+            const rows = await query("select * from usuario")
 
             return rows
         } catch (error) {
