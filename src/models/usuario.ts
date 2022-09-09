@@ -1,100 +1,62 @@
-import {query} from '../database/config'
-import { UsuarioDef, VerifyAccountDef } from '../types';
+import { Schema, model } from 'mongoose';
 
-export default class {
-    static async registrar(data: UsuarioDef){
-        try {
-            
-            const {nombre, apellido, celular, email, password, google, rol} = data
-            
-            const rows = await query(`
-                insert into usuario(nombre,apellido,celular,email,password,google,id_rol)
-                values(
-                    "${ nombre }",
-                    "${ apellido }",
-                    "${ celular }", 
-                    "${ email }", 
-                    "${ password }", 
-                    ${ google },
-                    ${ rol }
-                )`
-            );
-
-            return rows
-        } catch (error) {
-           console.log(error);
-           throw error  
-        }
-    }
-
-    static async verificarCuenta( data: VerifyAccountDef ) {
-        try {
-            const {id, verified } = data
-
-            const rows = await query(`
-                update usuario set verificado = ${ Number( verified ) } where
-                id=${ id }
-            `)
-
-            return rows
-        } catch (error) {
-            
-            throw error
-                        
-        }
-    }
-
-    static async listar(){
-        try {
-            
-            const rows = await query("select * from usuario")
-
-            return rows
-        } catch (error) {
-            console.log(error);
-            throw error   
-        }
-    }
-
-
-    // static async actualizarNotificacionToken(id, token){
-    //     try {
-    //         const rows = await query(`update usuario set notif_token="${ token }" where id=${id}`);
-    //         return rows
-    //     } catch (error) {
-    //         console.log(error);
-    //         throw error  
-    //     }
-    // }
-
-    // static async actualizar(data={}){
-    //     try {
-    //         const {} = data
-    //     } catch (error) {
-            
-    //     }
-    // }
-
-    static async eliminar(id:string){
-        try {
-            await query(`update usuario set estado=0 where id=${ id }`)
-            return true
-        } catch (error) {
-            console.log(error);
-            return false
-        }
-    }
-
-    static async buscar(_id:number){
-        try {
-            //const [ usuario ] = await query(`select id,nombre_completo from usuario where id=${ id }`);
-            //return usuario
-            return
-        } catch (error) {
-            console.log(error);
-            return false
-        }
-    }
-
-
+interface IUser {
+    nombre: string;
+    apellido: string;
+    celular: string;
+    correo: string;
+    password: string;
+    img: string;
+    rol: string;
+    estado: boolean;
+    google: boolean;
 }
+
+
+const UsuarioSchema = new Schema<IUser>({
+    nombre: {
+        type: String,
+        required: [true, "El nombre es obligatorio"],
+    },
+    apellido: {
+        type: String,
+        required: [true, "El apellido es obligatorio"],
+    },
+    celular:{
+        type: String,
+        required: [true, "El numero de celular es obligatorio"]
+    },
+    correo: {
+        type: String,
+        required: [true, "El correo es obligatorio"],
+        unique: true
+    },
+    password: {
+        type: String,
+        required: [true, 'El password es obligatorio']
+    },
+    img:{
+        type: String,
+    },
+    rol:{
+        type: String,
+        required: true,
+        enum: ['USER_ROLE','ADMIN_ROLE'],
+    },
+    estado:{
+        type: Boolean,
+        default: false,
+    },
+    google:{
+        type: Boolean,
+        default: false
+    } 
+});
+
+UsuarioSchema.methods.toJSON = function () {
+    const { __v, password, _id, ...usuario } = this.toObject();
+    usuario.uid = _id;
+    return usuario;
+}
+
+export default model( 'Usuario', UsuarioSchema );

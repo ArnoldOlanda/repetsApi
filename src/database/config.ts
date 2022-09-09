@@ -1,29 +1,19 @@
-import mysql from 'mysql2/promise'
+import mongoose, { ConnectOptions } from 'mongoose'
 
+export const dbConnection = async () => {
+    try {
+        
+        await mongoose.connect(`${ process.env.MONGODB_ATLAS }`,{
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            autoIndex: true
+        } as ConnectOptions);
 
-//Production
-// const configProduction = {
-//     host:"us-cdbr-east-05.cleardb.net",
-//     user:"b6f9ccb0065180",
-//     database:"heroku_fa1f6c8f445bc02",
-//     password:"c8217cf3",
-//     multipleStatements: true
-// }
+        console.log('Database connected...');
+        
 
-//Development
-const config = {
-    host:"localhost",
-    user:"root",
-    database:"repets",
-    password:"admin",
-    multipleStatements: true
+    } catch (error) {
+        console.log(error);
+        throw new Error('Error al conectar la base de datos')
+    }
 }
-
-export const query = async (queryString = "select 1 + 1 ") =>{
-   const connection = await mysql.createConnection(config)
-   const [rows] = await connection.execute(queryString)
-   
-   connection.end();
-   return rows
-}
-

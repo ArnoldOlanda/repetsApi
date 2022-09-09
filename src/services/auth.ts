@@ -1,48 +1,41 @@
-//@ts-check
-// const bcryptjs = require('bcryptjs');
-// const { generarJWT } = require('../helpers/generarJWT');
-// const Usuario = require('../models/usuario');
-// const { query } = require('../database/config')
 
 import { Request, Response } from "express";
 import bcryptjs from 'bcryptjs'
-import { query } from "../database/config";
 import { generarJWT } from '../helpers/generarJWT'
-import { RowDataPacket } from "mysql2";
+import Usuario from '../models/usuario'
 
 
-export const login = async (req: Request,res: Response )  =>{
+
+export const login = async ( req: Request, res: Response )  =>{
     
     const { usuario, password } = req.body;
 
     try {
 
         //Verificar si el email existe
-        const usuarioDb = await query(`select * from usuario where email = "${ usuario }"`) as RowDataPacket;
-        console.log(usuarioDb);
-        
-        
-        if(!usuarioDb[0]) return res.status(400).json({
-             msg:'El usuario no existe'
+        const usuarioDb = await Usuario.findOne({ correo: usuario })  
+
+        if( !usuarioDb ) return res.status(400).json({
+              msg:'El usuario no existe'
         })
 
         //Si el usuario esta activo
-        // if (!usuarioDb[0].estado) return res.status(400).json({
-        //     msg:'Este usuario no se encuentra registrado en la base de datos'
-        // })
+        if (usuarioDb.estado === false) return res.status(400).json({
+            msg:'Este usuario no se encuentra registrado en la base de datos'
+        })
         
         //Verificar el password
-        const validaPassword = bcryptjs.compareSync( password,usuarioDb[0].password );
+        const validaPassword = bcryptjs.compareSync( password, usuarioDb.password );
 
         if(!validaPassword) return res.status(400).json({
-             msg:'El password proporcionado para el usuario es incorrecto'
+              msg:'El password proporcionado para el usuario es incorrecto'
         })
         // Generar el jwt
-        const token = await generarJWT( usuarioDb[0].id )
+        const token = await generarJWT(usuarioDb.id)
 
 
         return res.json({
-            usuario:usuarioDb[0],
+            usuario: usuarioDb,
             token
         })
     } catch (error) {

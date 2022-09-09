@@ -3,9 +3,11 @@ import jwt from 'jsonwebtoken'
 
 
 export const generarJWT = (uid: string) =>{
+
     return new Promise (( resolve,reject ) => {
 
         const payload = { uid };
+        
         jwt.sign( payload, process.env.SECRETORPRIVATEKEY as string, {
             expiresIn : '4h'
         },( error,token )=>{

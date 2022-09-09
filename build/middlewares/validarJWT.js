@@ -24,7 +24,7 @@ const validarJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
     try {
         const { uid } = jsonwebtoken_1.default.verify(token, process.env.SECRETORPRIVATEKEY);
-        const usuario = yield usuario_1.default.buscar(Number(uid));
+        const usuario = yield usuario_1.default.findById(uid);
         //Validar que el usuario exista en la base de datos
         if (!usuario) {
             return res.status(401).json({
@@ -32,15 +32,13 @@ const validarJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             });
         }
         //Validar que el estado del usuario sea TRUE
-        //@ts-ignore
-        if (usuario.estado == 0) {
+        if (!usuario.estado) {
             return res.status(401).json({
                 msg: 'Token no valido - usuario no activo'
             });
         }
-        //@ts-ignore
-        req.autenthicatedUser = usuario,
-            next();
+        req.autenthicatedUser = usuario;
+        next();
         return;
     }
     catch (error) {
@@ -51,3 +49,4 @@ const validarJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.validarJWT = validarJWT;
+//# sourceMappingURL=validarJWT.js.map

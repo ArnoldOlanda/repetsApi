@@ -6,7 +6,11 @@ interface JwtPayload{
     uid: string
 }
 
-export const validarJWT = async ( req: Request, res: Response, next:NextFunction ) =>{
+interface IGetUserAuthInfo extends Request {
+    autenthicatedUser: object // or any other type
+}
+
+export const validarJWT = async ( req: IGetUserAuthInfo, res: Response, next:NextFunction ) =>{
 
     const token = req.header('access-token');
 
@@ -19,7 +23,7 @@ export const validarJWT = async ( req: Request, res: Response, next:NextFunction
     try {
         const { uid } = jwt.verify( token, process.env.SECRETORPRIVATEKEY as string ) as JwtPayload
         
-        const usuario = await Usuario.buscar( Number( uid ) );
+        const usuario = await Usuario.findById( uid );
         
         //Validar que el usuario exista en la base de datos
         if ( !usuario ) {
@@ -29,14 +33,14 @@ export const validarJWT = async ( req: Request, res: Response, next:NextFunction
         }
         
         //Validar que el estado del usuario sea TRUE
-        //@ts-ignore
-        if( usuario.estado == 0 ) {
+        
+        if( !usuario.estado ) {
             return res.status(401).json({
                 msg: 'Token no valido - usuario no activo'
             })
         }
-        //@ts-ignore
-        req.autenthicatedUser = usuario,
+        
+        req.autenthicatedUser = usuario 
 
         next();
         return

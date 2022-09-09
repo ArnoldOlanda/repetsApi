@@ -1,21 +1,24 @@
 
 import { Request, Response } from "express";
 import bcryptjs from 'bcryptjs'
-import Usuario from '../models/usuario';
 import { UsuarioDef } from "../types";
 import { generateVerifyCode } from "../helpers/generateVerifyCode";
+import { sendMail } from "../helpers/sendMail";
+import Usuario from "../models/usuario";
 
 
 export const getUser = async (_req: Request, res: Response) => {
-    //const { limite = 5, desde = 0 } = req.query;
+    const data = _req
+
     try {
-        const data = await Usuario.listar();
+        const data = await Usuario.find();
 
         return res.json({
             data
         })
     } catch (error) {
-        return
+        console.log( error );
+        throw error;    
     }
 
 }
@@ -24,19 +27,26 @@ export const postUser = async (req: Request, res: Response) => {
 
     try {
         let { password, ...resto } = req.body as UsuarioDef;
-
+        
+        
         const salt = bcryptjs.genSaltSync();
-
+        
         password = bcryptjs.hashSync( password, salt );
+        
+        const usuario = new Usuario({...resto, password });
 
-        await Usuario.registrar({ password,...resto });
-
+        await usuario.save();
+        
         const verifyCode = generateVerifyCode()
 
-        //TODO: crear helper para envio de correo con el codigo de verificacion
+        const { correo } = resto;
+        
+        //Enviar correo con codigo de verificacion
+        sendMail( correo, verifyCode )
 
         return res.json({
             msg: "Usuario registrado",
+            usuario,
             verifyCode
         })
 
@@ -51,30 +61,59 @@ export const postUser = async (req: Request, res: Response) => {
 export const patchVerifyNewUser = async( req:Request, res: Response ) =>{
     try {
         const { id, generateCode, givenCode } = req.body
+        console.log(id);
+        
         if(generateCode !== givenCode ) {
             return res.status(400).json({
                 err: "codigo de verificacion incorrecto"
             })
         }else{
-            const rows = await Usuario.verificarCuenta({ id, verified: true })
-            console.log(rows);
+            const usuario = await Usuario.findByIdAndUpdate( id, { estado: true },{ new: true });
             return res.json({
-                msg: 'cuenta activada'
+                msg: 'cuenta activada',
+                usuario
             })
         }
         
     } catch (error) {
+
+        console.log(error);
+        
         return res.status(400).json({
             err: "Ocurrio un error al intentar activar la cuenta de usuario hable con el administrador"
         })
     }
 }
 
+export const putUser = async( req:Request, res: Response ) => {
+
+
+    const { id } = req.params
+    const data = req.body
+
+    try {
+        const user = await Usuario.findByIdAndUpdate(id, data);
+
+        return res.json({
+            msg: "Usuario actualizado",
+            usuario: user
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            err: "Ocurrio un error al intentar actualizar la informacion del usuario hable con el administrador"
+        })
+    }
+
+}
+
 export const deleteUser = async (req: Request, res: Response) => {
     const { id } = req.params
 
     try {
-        const user = await Usuario.eliminar(id)
+        const user = await Usuario.findByIdAndUpdate(id,{ estado: false });
+
         if (!user) {
             return res.status(400).json({
                 err: "Ocurrio un error al intentar eliminar al usuario hable con el administrador"
@@ -85,6 +124,7 @@ export const deleteUser = async (req: Request, res: Response) => {
             msg: "Usuario eliminado"
         })
     } catch (error) {
+        console.log(error);
         return res.status(400).json({
             err: "Ocurrio un error al intentar eliminar al usuario hable con el administrador"
         })

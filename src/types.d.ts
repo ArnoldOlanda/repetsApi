@@ -2,7 +2,7 @@ export interface UsuarioDef{
     nombre: string;
     apellido: string;
     celular: string;
-    email: string;
+    correo: string;
     password: string;
     google: boolean;
     rol: number

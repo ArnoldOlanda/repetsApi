@@ -1,12 +1,23 @@
 import { Router } from 'express'
 import { check } from 'express-validator'
-import { getUser, postUser, deleteUser, patchVerifyNewUser } from '../services/users';
 
-import { validarJWT, validarCampos} from '../middlewares'
+import { emailExiste, esRoleValido, existeUsuarioId } from '../helpers/dbValidator';
+import {
+    getUser,
+    postUser,
+    patchVerifyNewUser,
+    deleteUser, 
+    putUser
+} from '../services/users';
+
+import { 
+    //validarJWT, 
+    validarCampos
+} from '../middlewares'
 
 
 // const { existeUsuarioId } = require ('../helpers/dbValidator')
-import { existeUsuarioId } from '../helpers/dbValidator'
+// import { existeUsuarioId } from '../helpers/dbValidator'
 
 const router = Router();
 
@@ -18,25 +29,37 @@ router.post   ('/',[
     check('nombre','El campo es obligatorio').not().isEmpty(),
     check('apellido','El campo es obligatorio').not().isEmpty(),
     check('celular','El campo es obligatorio').isString(),
-    check('email','El campo es obligatorio').isEmail(),
-    check('password','El campo es obligatorio').not().isEmpty(),
+    check('correo','El campo tiene que ser un correo valido').isEmail(),
+    check('correo').custom( emailExiste ),
+    check('password','El campo es obligatorio').isLength({ min: 8 }),
     check('google','El campo es obligatorio').isBoolean(),
-    check('rol','El campo es obligatorio').isNumeric(),
+    check('rol').custom( esRoleValido ),
     validarCampos //Captura todos los errores y los muestra
 ], postUser )
 
 router.patch('/verifyAccount',[
-    check('id','Este campo debe ser un numero').isNumeric(),
+    check('id','Este campo debe ser un ID valido').isMongoId(),
+    check('id').custom( existeUsuarioId ),
     check('generateCode','Este campo debe ser un numero').isNumeric(),
     check('givenCode','Este campo debe ser un numero').isNumeric(),
     validarCampos
 ],patchVerifyNewUser)
 
+router.put('/:id',[
+    check('id','No es un ID valido').isMongoId(),
+    check('nombre','El campo es obligatorio').not().isEmpty(),
+    check('apellido','El campo es obligatorio').not().isEmpty(),
+    check('celular','El campo es obligatorio').not().isEmpty(),
+    check('correo','No es un correo valido').isEmail(),
+    check('correo').custom(emailExiste),
+    validarCampos
+] ,putUser);
+
 router.delete ('/:id',[
-    validarJWT,
-    check( 'id','No es un ID valido' ).isNumeric(),
+    //validarJWT,
+    check( 'id','No es un ID valido' ).isMongoId(),
     check( 'id' ).custom( existeUsuarioId ),
     validarCampos
-], deleteUser )
+], deleteUser );
 
 export default router;
