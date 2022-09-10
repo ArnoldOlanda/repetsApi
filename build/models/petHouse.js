@@ -13,9 +13,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const PetHouseSchema = new mongoose_1.Schema({
-    nombre: {
-        type: String,
-    },
+    nombre: { type: String, },
     distrito: {
         type: String,
         required: [true, "El distrito es obligatorio"],
@@ -47,19 +45,10 @@ const PetHouseSchema = new mongoose_1.Schema({
         type: String,
         required: [true, 'El nombre del propietario es obligatorio']
     },
-    img: [{
-            type: String
-        }],
-    tarifa_dia: {
-        type: Number,
-    },
-    tarifa_hora: {
-        type: Number,
-        required: true
-    },
-    calificacion: {
-        type: Number
-    },
+    img: [{ type: String }],
+    tarifa_dia: { type: Number, },
+    tarifa_hora: { type: Number, required: true },
+    calificacion: { type: Number },
     categorias: [{
             type: mongoose_1.Schema.Types.ObjectId,
             ref: 'Categoria',

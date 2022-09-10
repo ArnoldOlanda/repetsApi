@@ -14,7 +14,7 @@ router.post('/', [
     (0, express_validator_1.check)('nombre', 'El campo es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('apellido', 'El campo es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('celular', 'El campo es obligatorio').isString(),
-    (0, express_validator_1.check)('correo', 'El campo es obligatorio').isEmail(),
+    (0, express_validator_1.check)('correo', 'El campo tiene que ser un correo valido').isEmail(),
     (0, express_validator_1.check)('correo').custom(dbValidator_1.emailExiste),
     (0, express_validator_1.check)('password', 'El campo es obligatorio').isLength({ min: 8 }),
     (0, express_validator_1.check)('google', 'El campo es obligatorio').isBoolean(),
@@ -28,15 +28,15 @@ router.patch('/verifyAccount', [
     (0, express_validator_1.check)('givenCode', 'Este campo debe ser un numero').isNumeric(),
     middlewares_1.validarCampos
 ], users_1.patchVerifyNewUser);
-router.patch('/:id', [
+router.put('/:id', [
     (0, express_validator_1.check)('id', 'No es un ID valido').isMongoId(),
-    (0, express_validator_1.check)('nombre').not().isEmpty,
-    (0, express_validator_1.check)('apellido').not().isEmpty,
-    (0, express_validator_1.check)('celular').not().isEmpty,
+    (0, express_validator_1.check)('nombre', 'El campo es obligatorio').not().isEmpty(),
+    (0, express_validator_1.check)('apellido', 'El campo es obligatorio').not().isEmpty(),
+    (0, express_validator_1.check)('celular', 'El campo es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('correo', 'No es un correo valido').isEmail(),
     (0, express_validator_1.check)('correo').custom(dbValidator_1.emailExiste),
     middlewares_1.validarCampos
-], users_1.patchUser);
+], users_1.putUser);
 router.delete('/:id', [
     //validarJWT,
     (0, express_validator_1.check)('id', 'No es un ID valido').isMongoId(),

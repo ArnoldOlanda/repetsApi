@@ -23,12 +23,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.patchUser = exports.patchVerifyNewUser = exports.postUser = exports.getUser = void 0;
+exports.deleteUser = exports.putUser = exports.patchVerifyNewUser = exports.postUser = exports.getUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generateVerifyCode_1 = require("../helpers/generateVerifyCode");
 const sendMail_1 = require("../helpers/sendMail");
 const usuario_1 = __importDefault(require("../models/usuario"));
 const getUser = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const data = _req;
     try {
         const data = yield usuario_1.default.find();
         return res.json({
@@ -91,10 +92,9 @@ const patchVerifyNewUser = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.patchVerifyNewUser = patchVerifyNewUser;
-const patchUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const putUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const data = req.body;
-    console.log(data);
     try {
         const user = yield usuario_1.default.findByIdAndUpdate(id, data);
         return res.json({
@@ -109,7 +109,7 @@ const patchUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
 });
-exports.patchUser = patchUser;
+exports.putUser = putUser;
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {

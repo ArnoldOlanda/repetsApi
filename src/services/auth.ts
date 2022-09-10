@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import bcryptjs from 'bcryptjs'
 import { generarJWT } from '../helpers/generarJWT'
 import Usuario from '../models/usuario'
+import { googleVerify } from "../helpers/googleVerify";
 
 
 
@@ -33,7 +34,6 @@ export const login = async ( req: Request, res: Response )  =>{
         // Generar el jwt
         const token = await generarJWT(usuarioDb.id)
 
-
         return res.json({
             usuario: usuarioDb,
             token
@@ -47,48 +47,52 @@ export const login = async ( req: Request, res: Response )  =>{
 
 }
 
-// const googleSignIn = async (req, res=response ) =>{
-//     const { id_token } = req.body
+export const googleSignIn = async (req: Request, res: Response ) =>{
+    const { id_token } = req.body
 
-//     try {
+    try {
 
-//         const { name,email,picture } = await googleVerify( id_token );
+        const { name,email,picture } = await googleVerify( id_token );
 
-//         let usuario = await Usuario.findOne({ correo:email })
+        let usuario = await Usuario.findOne({ correo:email })
 
-//         if(!usuario){
-//             const data = {
-//                 nombre:name,
-//                 correo:email,
-//                 password:':v',
-//                 img:picture,
-//                 google:true,
-//                 rol:'USER_ROLE'
-//             }
-//             usuario = new Usuario(data)
-//             console.log(usuario);
-//             await usuario.save();
-//         }
+        if(!usuario){
+            const data = {
+                nombre:name,
+                correo:email,
+                password:':v',
+                img:picture,
+                google:true,
+                rol:'USER_ROLE'
+            }
+            usuario = new Usuario(data);
 
-//         if(!usuario.estado){
-//             return res.status(401).json({
-//                 msg:'Usuario no activo'
-//             })
-//         }
+            console.log(usuario);
 
-//         // Generar el jwt
-//         const token = await generarJWT( usuario.id )
+            await usuario.save();
+        }
 
-//         res.json({
-//             usuario,
-//             token
-//         })
-//     } catch (error) {
-//         console.log(error);
-//         res.status(400).json({
-//             ok:'false',
-//             msg:'No se pudo verificar el token'
-//         })
-//     }
+        if(!usuario.estado){
+            return res.status(401).json({
+                msg:'usuario bloqueado, hable con el administrador'
+            })
+        }
 
-// } 
+        // Generar el jwt
+        const token = await generarJWT( usuario.id )
+
+        return res.json({
+            usuario,
+            token
+        })
+    } catch (error) {
+
+        console.log(error);
+
+        return res.status(400).json({
+            ok:'false',
+            msg:'No se pudo verificar el token'
+        })
+    }
+
+} 

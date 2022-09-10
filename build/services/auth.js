@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = void 0;
+exports.googleSignIn = exports.login = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generarJWT_1 = require("../helpers/generarJWT");
 const usuario_1 = __importDefault(require("../models/usuario"));
+const googleVerify_1 = require("../helpers/googleVerify");
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { usuario, password } = req.body;
     try {
@@ -51,41 +52,43 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.login = login;
-// const googleSignIn = async (req, res=response ) =>{
-//     const { id_token } = req.body
-//     try {
-//         const { name,email,picture } = await googleVerify( id_token );
-//         let usuario = await Usuario.findOne({ correo:email })
-//         if(!usuario){
-//             const data = {
-//                 nombre:name,
-//                 correo:email,
-//                 password:':v',
-//                 img:picture,
-//                 google:true,
-//                 rol:'USER_ROLE'
-//             }
-//             usuario = new Usuario(data)
-//             console.log(usuario);
-//             await usuario.save();
-//         }
-//         if(!usuario.estado){
-//             return res.status(401).json({
-//                 msg:'Usuario no activo'
-//             })
-//         }
-//         // Generar el jwt
-//         const token = await generarJWT( usuario.id )
-//         res.json({
-//             usuario,
-//             token
-//         })
-//     } catch (error) {
-//         console.log(error);
-//         res.status(400).json({
-//             ok:'false',
-//             msg:'No se pudo verificar el token'
-//         })
-//     }
-// } 
+const googleSignIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id_token } = req.body;
+    try {
+        const { name, email, picture } = yield (0, googleVerify_1.googleVerify)(id_token);
+        let usuario = yield usuario_1.default.findOne({ correo: email });
+        if (!usuario) {
+            const data = {
+                nombre: name,
+                correo: email,
+                password: ':v',
+                img: picture,
+                google: true,
+                rol: 'USER_ROLE'
+            };
+            usuario = new usuario_1.default(data);
+            console.log(usuario);
+            yield usuario.save();
+        }
+        if (!usuario.estado) {
+            return res.status(401).json({
+                msg: 'usuario bloqueado, hable con el administrador'
+            });
+        }
+        // Generar el jwt
+        const token = yield (0, generarJWT_1.generarJWT)(usuario.id);
+        return res.json({
+            usuario,
+            token
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            ok: 'false',
+            msg: 'No se pudo verificar el token'
+        });
+    }
+});
+exports.googleSignIn = googleSignIn;
 //# sourceMappingURL=auth.js.map

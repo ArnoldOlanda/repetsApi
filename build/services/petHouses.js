@@ -23,12 +23,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postPetHouse = exports.getPetHouse = void 0;
+exports.deletePetHouse = exports.putPetHouse = exports.postPetHouse = exports.getPetHouse = void 0;
 const petHouse_1 = __importDefault(require("../models/petHouse"));
+// Lista de pethouses
 const getPetHouse = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield petHouse_1.default.find()
-            .populate('categorias', { categoria: 1 });
+        const data = yield petHouse_1.default.find().populate('categorias', { categoria: 1 });
         return res.json({
             data
         });
@@ -43,7 +43,6 @@ exports.getPetHouse = getPetHouse;
 const postPetHouse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = __rest(req.body, []);
-        console.log(data);
         const petHouse = new petHouse_1.default(data);
         yield petHouse.save();
         return res.json({
@@ -54,27 +53,42 @@ const postPetHouse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     catch (error) {
         //console.log(error);
         return res.status(400).json({
-            err: "Ocurrio un error al intentar registrar al usuario hable con el administrador"
+            err: "Error al registrar, hable con el administrador"
         });
     }
 });
 exports.postPetHouse = postPetHouse;
-// export const deleteUser = async (req: Request, res: Response) => {
-//     const { id } = req.params
-//     try {
-//         const user = await Usuario.eliminar(id)
-//         if (!user) {
-//             return res.status(400).json({
-//                 err: "Ocurrio un error al intentar eliminar al usuario hable con el administrador"
-//             })
-//         }
-//         return res.json({
-//             msg: "Usuario eliminado"
-//         })
-//     } catch (error) {
-//         return res.status(400).json({
-//             err: "Ocurrio un error al intentar eliminar al usuario hable con el administrador"
-//         })
-//     }
-// }
+const putPetHouse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const data = req.body;
+        const petHouse = yield petHouse_1.default.findByIdAndUpdate(id, data);
+        return res.json({
+            msg: "PetHouse actualizada",
+            petHouse,
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            err: "Error al actualizar, hable con el administrador"
+        });
+    }
+});
+exports.putPetHouse = putPetHouse;
+const deletePetHouse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    try {
+        yield petHouse_1.default.findByIdAndUpdate(id, { estado: false });
+        return res.json({
+            msg: "PetHouse eliminada"
+        });
+    }
+    catch (error) {
+        return res.status(400).json({
+            err: "Error al eliminar, hable con el administrador"
+        });
+    }
+});
+exports.deletePetHouse = deletePetHouse;
 //# sourceMappingURL=petHouses.js.map
