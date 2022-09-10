@@ -16,11 +16,11 @@ exports.sendMail = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const sendMail = (mailTo, verifyCode) => __awaiter(void 0, void 0, void 0, function* () {
     const config = {
-        host: 'smtp.gmail.com',
-        port: 587,
+        host: `${process.env.GMAIL_SENDER_HOST}`,
+        port: Number(process.env.GMAIL_SENDER_PORT),
         auth: {
-            user: 'olanda188@gmail.com',
-            pass: 'lzkqaiixpqcpryaj'
+            user: `${process.env.GMAIL_SENDER}`,
+            pass: `${process.env.GMAIL_SENDER_PASSWORD}`
         }
     };
     const mensaje = {
