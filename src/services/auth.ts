@@ -22,14 +22,14 @@ export const login = async ( req: Request, res: Response )  =>{
 
         //Si el usuario esta activo
         if (usuarioDb.estado === false) return res.status(400).json({
-            msg:'Este usuario no se encuentra registrado en la base de datos'
+            msg:'Este usuario no esta registrado '
         })
         
         //Verificar el password
         const validaPassword = bcryptjs.compareSync( password, usuarioDb.password );
 
         if(!validaPassword) return res.status(400).json({
-              msg:'El password proporcionado para el usuario es incorrecto'
+              msg:'El password es incorrecto'
         })
         // Generar el jwt
         const token = await generarJWT(usuarioDb.id)
@@ -41,7 +41,7 @@ export const login = async ( req: Request, res: Response )  =>{
     } catch (error) {
         console.log( error );
         return res.status(500).json({
-            msg: 'Ha ocurrido un error hable con el administrador'
+            msg: 'Error al loguear, hable con el administrador'
         })
     }
 
@@ -74,7 +74,7 @@ export const googleSignIn = async (req: Request, res: Response ) =>{
 
         if(!usuario.estado){
             return res.status(401).json({
-                msg:'usuario bloqueado, hable con el administrador'
+                msg:'Usuario bloqueado, hable con el administrador'
             })
         }
 
@@ -91,7 +91,7 @@ export const googleSignIn = async (req: Request, res: Response ) =>{
 
         return res.status(400).json({
             ok:'false',
-            msg:'No se pudo verificar el token'
+            err:'No se pudo verificar el token'
         })
     }
 

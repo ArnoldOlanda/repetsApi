@@ -5,6 +5,7 @@ import { UsuarioDef } from "../types";
 import { generateVerifyCode } from "../helpers/generateVerifyCode";
 import { sendMail } from "../helpers/sendMail";
 import Usuario from "../models/usuario";
+import { generarJWT } from "../helpers/generarJWT";
 
 
 export const getUser = async (_req: Request, res: Response) => {
@@ -45,14 +46,14 @@ export const postUser = async (req: Request, res: Response) => {
         sendMail( correo, verifyCode )
 
         return res.json({
-            msg: "Usuario registrado",
+            msg: "ok - Usuario registrado",
             usuario,
             verifyCode
         })
 
     } catch (error) {
         return res.status(400).json({
-            err: "Ocurrio un error al intentar registrar al usuario hable con el administrador"
+            err: "Error al registrar, hable con el administrador"
         })
     }
 
@@ -65,13 +66,17 @@ export const patchVerifyNewUser = async( req:Request, res: Response ) =>{
         
         if(generateCode !== givenCode ) {
             return res.status(400).json({
-                err: "codigo de verificacion incorrecto"
+                err: "Codigo de verificacion incorrecto"
             })
         }else{
             const usuario = await Usuario.findByIdAndUpdate( id, { estado: true },{ new: true });
+
+            const token = await generarJWT( id );
+
             return res.json({
-                msg: 'cuenta activada',
-                usuario
+                msg: 'ok - Cuenta activada',
+                usuario,
+                token
             })
         }
         
@@ -80,7 +85,7 @@ export const patchVerifyNewUser = async( req:Request, res: Response ) =>{
         console.log(error);
         
         return res.status(400).json({
-            err: "Ocurrio un error al intentar activar la cuenta de usuario hable con el administrador"
+            err: "Error al activar la cuenta, hable con el administrador"
         })
     }
 }
@@ -95,14 +100,14 @@ export const putUser = async( req:Request, res: Response ) => {
         const user = await Usuario.findByIdAndUpdate(id, data);
 
         return res.json({
-            msg: "Usuario actualizado",
+            msg: "ok - Usuario actualizado",
             usuario: user
         })
 
     } catch (error) {
         console.log(error);
         return res.status(400).json({
-            err: "Ocurrio un error al intentar actualizar la informacion del usuario hable con el administrador"
+            err: "Error al actualizar, hable con el administrador"
         })
     }
 
@@ -116,7 +121,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 
         if (!user) {
             return res.status(400).json({
-                err: "Ocurrio un error al intentar eliminar al usuario hable con el administrador"
+                err: "Error al eliminar, hable con el administrador"
             })
         }
 
@@ -126,7 +131,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     } catch (error) {
         console.log(error);
         return res.status(400).json({
-            err: "Ocurrio un error al intentar eliminar al usuario hable con el administrador"
+            err: "Error al eliminar, hable con el administrador"
         })
     }
 

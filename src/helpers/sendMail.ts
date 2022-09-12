@@ -39,7 +39,7 @@ export const sendMail = async ( mailTo: string, verifyCode: number ) => {
 
     const info = await transport.sendMail( mensaje )
 
-    console.log(info);
+    console.log( info.response );
     
 }
 

@@ -2,6 +2,8 @@ import { Router } from 'express'
 import { check } from 'express-validator'
 
 import { emailExiste, esRoleValido, existeUsuarioId } from '../helpers/dbValidator';
+import { validarJWT, validarCampos } from '../middlewares'
+
 import {
     getUser,
     postUser,
@@ -9,11 +11,6 @@ import {
     deleteUser, 
     putUser
 } from '../services/users';
-
-import { 
-    //validarJWT, 
-    validarCampos
-} from '../middlewares'
 
 
 // const { existeUsuarioId } = require ('../helpers/dbValidator')
@@ -46,6 +43,8 @@ router.patch('/verifyAccount',[
 ],patchVerifyNewUser)
 
 router.put('/:id',[
+    //@ts-ignore
+    validarJWT,
     check('id','No es un ID valido').isMongoId(),
     check('nombre','El campo es obligatorio').not().isEmpty(),
     check('apellido','El campo es obligatorio').not().isEmpty(),
@@ -56,7 +55,8 @@ router.put('/:id',[
 ] ,putUser);
 
 router.delete ('/:id',[
-    //validarJWT,
+    //@ts-ignore
+    validarJWT,
     check( 'id','No es un ID valido' ).isMongoId(),
     check( 'id' ).custom( existeUsuarioId ),
     validarCampos
