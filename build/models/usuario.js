@@ -19,11 +19,9 @@ const UsuarioSchema = new mongoose_1.Schema({
     },
     apellido: {
         type: String,
-        required: [true, "El apellido es obligatorio"],
     },
     celular: {
         type: String,
-        required: [true, "El numero de celular es obligatorio"]
     },
     correo: {
         type: String,

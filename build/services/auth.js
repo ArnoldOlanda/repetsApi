@@ -64,6 +64,7 @@ const googleSignIn = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 password: ':v',
                 img: picture,
                 google: true,
+                estado: true,
                 rol: 'USER_ROLE'
             };
             usuario = new usuario_1.default(data);

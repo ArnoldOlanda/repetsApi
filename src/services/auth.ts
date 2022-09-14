@@ -63,6 +63,7 @@ export const googleSignIn = async (req: Request, res: Response ) =>{
                 password:':v',
                 img:picture,
                 google:true,
+                estado:true,
                 rol:'USER_ROLE'
             }
             usuario = new Usuario(data);
