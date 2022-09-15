@@ -31,7 +31,7 @@ const sendMail = (mailTo, verifyCode) => __awaiter(void 0, void 0, void 0, funct
     };
     const transport = nodemailer_1.default.createTransport(config);
     const info = yield transport.sendMail(mensaje);
-    console.log(info);
+    console.log(info.response);
 });
 exports.sendMail = sendMail;
 //# sourceMappingURL=sendMail.js.map

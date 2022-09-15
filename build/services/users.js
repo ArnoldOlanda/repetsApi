@@ -28,6 +28,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const generateVerifyCode_1 = require("../helpers/generateVerifyCode");
 const sendMail_1 = require("../helpers/sendMail");
 const usuario_1 = __importDefault(require("../models/usuario"));
+const generarJWT_1 = require("../helpers/generarJWT");
 const getUser = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const data = _req;
     try {
@@ -55,14 +56,14 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         //Enviar correo con codigo de verificacion
         (0, sendMail_1.sendMail)(correo, verifyCode);
         return res.json({
-            msg: "Usuario registrado",
+            msg: "ok - Usuario registrado",
             usuario,
             verifyCode
         });
     }
     catch (error) {
         return res.status(400).json({
-            err: "Ocurrio un error al intentar registrar al usuario hable con el administrador"
+            err: "Error al registrar, hable con el administrador"
         });
     }
 });
@@ -73,21 +74,23 @@ const patchVerifyNewUser = (req, res) => __awaiter(void 0, void 0, void 0, funct
         console.log(id);
         if (generateCode !== givenCode) {
             return res.status(400).json({
-                err: "codigo de verificacion incorrecto"
+                err: "Codigo de verificacion incorrecto"
             });
         }
         else {
             const usuario = yield usuario_1.default.findByIdAndUpdate(id, { estado: true }, { new: true });
+            const token = yield (0, generarJWT_1.generarJWT)(id);
             return res.json({
-                msg: 'cuenta activada',
-                usuario
+                msg: 'ok - Cuenta activada',
+                usuario,
+                token
             });
         }
     }
     catch (error) {
         console.log(error);
         return res.status(400).json({
-            err: "Ocurrio un error al intentar activar la cuenta de usuario hable con el administrador"
+            err: "Error al activar la cuenta, hable con el administrador"
         });
     }
 });
@@ -98,14 +101,14 @@ const putUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield usuario_1.default.findByIdAndUpdate(id, data);
         return res.json({
-            msg: "Usuario actualizado",
+            msg: "ok - Usuario actualizado",
             usuario: user
         });
     }
     catch (error) {
         console.log(error);
         return res.status(400).json({
-            err: "Ocurrio un error al intentar actualizar la informacion del usuario hable con el administrador"
+            err: "Error al actualizar, hable con el administrador"
         });
     }
 });
@@ -116,7 +119,7 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const user = yield usuario_1.default.findByIdAndUpdate(id, { estado: false });
         if (!user) {
             return res.status(400).json({
-                err: "Ocurrio un error al intentar eliminar al usuario hable con el administrador"
+                err: "Error al eliminar, hable con el administrador"
             });
         }
         return res.json({
@@ -126,7 +129,7 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         console.log(error);
         return res.status(400).json({
-            err: "Ocurrio un error al intentar eliminar al usuario hable con el administrador"
+            err: "Error al eliminar, hable con el administrador"
         });
     }
 });

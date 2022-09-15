@@ -3,10 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
 const dbValidator_1 = require("../helpers/dbValidator");
-const users_1 = require("../services/users");
 const middlewares_1 = require("../middlewares");
-// const { existeUsuarioId } = require ('../helpers/dbValidator')
-// import { existeUsuarioId } from '../helpers/dbValidator'
+const users_1 = require("../services/users");
 const router = (0, express_1.Router)();
 // router.get    ('/',[ validarJWT ], getUser )
 router.get('/', users_1.getUser);
@@ -29,7 +27,10 @@ router.patch('/verifyAccount', [
     middlewares_1.validarCampos
 ], users_1.patchVerifyNewUser);
 router.put('/:id', [
+    //@ts-ignore
+    middlewares_1.validarJWT,
     (0, express_validator_1.check)('id', 'No es un ID valido').isMongoId(),
+    (0, express_validator_1.check)('id').custom(dbValidator_1.existeUsuarioId),
     (0, express_validator_1.check)('nombre', 'El campo es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('apellido', 'El campo es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('celular', 'El campo es obligatorio').not().isEmpty(),
@@ -38,7 +39,8 @@ router.put('/:id', [
     middlewares_1.validarCampos
 ], users_1.putUser);
 router.delete('/:id', [
-    //validarJWT,
+    //@ts-ignore
+    middlewares_1.validarJWT,
     (0, express_validator_1.check)('id', 'No es un ID valido').isMongoId(),
     (0, express_validator_1.check)('id').custom(dbValidator_1.existeUsuarioId),
     middlewares_1.validarCampos
