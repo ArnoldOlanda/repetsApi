@@ -1,6 +1,6 @@
 const {OAuth2Client} = require('google-auth-library');
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID_ANDROID);
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const  googleVerify = async( token: string ) => {
   const ticket = await client.verifyIdToken({
