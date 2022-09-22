@@ -7,6 +7,7 @@ import routerUsers from '../routes/users'
 import routerAuth from '../routes/auth'
 import routerPetHouses from '../routes/petHouses'
 import routerCategorias from '../routes/categorias'
+import routerPets from '../routes/pets'
 
 import { dbConnection } from '../database/config';
 
@@ -40,6 +41,7 @@ class Server {
     authPath: string;
     petHousePath: string;
     categoriaPath: string;
+    petsPath: string;
 
     constructor() {
         this.app = express();
@@ -52,6 +54,7 @@ class Server {
         this.authPath = '/api/auth';
         this.petHousePath = '/api/petHouses';
         this.categoriaPath = '/api/categorias';
+        this.petsPath = '/api/pets';
 
         //Conectar a base de datos
         this.conectarDB()
@@ -88,6 +91,7 @@ class Server {
         this.app.use(this.authPath, routerAuth)
         this.app.use(this.petHousePath, routerPetHouses)
         this.app.use(this.categoriaPath, routerCategorias)
+        this.app.use(this.petsPath, routerPets)
     }
 
     sockets() {

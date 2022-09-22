@@ -1,6 +1,7 @@
 import Usuario from '../models/usuario'
 import Role from "../models/role";
 import PetHouse from '../models/petHouse'
+import Pet from '../models/pet'
 
 
 export const esRoleValido = async (rol:string) => {
@@ -33,6 +34,14 @@ export const existePethouseId = async( id: string ) => {
 
     const existe = await PetHouse.findById( id )
     if( !existe ) throw new Error (`No existe la PetHouse con id : ${ id }.`);
+
+}
+
+//Validar mascota si no existe
+export const existePetId = async( id: string ) => {
+
+    const existe = await Pet.findById( id )
+    if( !existe ) throw new Error (`No existe la Mascota con id : ${ id }.`);
 
 }
 

@@ -2,10 +2,11 @@ import { Schema, model } from 'mongoose';
 
 interface IPet {
     nombre: string;
-    especie: string;
+    tipo: string[];
     raza: string;
-    comportamiento: string[];
-    tamaño: string; //grande,pequeño
+    edad: number;
+    descripcion: string;
+    caracteristicas: string[]; 
     img: string;
 }
 
@@ -15,16 +16,15 @@ const PetSchema = new Schema<IPet>({
         type: String,
         required: [true, "El nombre es obligatorio"],
     },
-    especie: {
+    tipo: [{
         type: String,
-        required: [true, "La especie es obligatoria"],
-    },
+        required: [true, "El tipo de mascota es obligatoria"],
+    }],
     raza:{
         type: String,
         required: [true, "La raza es obligatoria"]
     },
-    comportamiento: [{ type: String, }],
-    tamaño: { type: String, },
+    caracteristicas: [{ type: String, }],
     img:{ type: String, },
 
 });

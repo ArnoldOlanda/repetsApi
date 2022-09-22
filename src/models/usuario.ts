@@ -10,8 +10,8 @@ interface IUser {
     rol: string;
     estado: boolean;
     google: boolean;
-    favoritos: [];
-    pets:[];
+    favoritos: Schema.Types.ObjectId[];
+    pets:Schema.Types.ObjectId[];
 }
 
 
