@@ -31,8 +31,11 @@ export const postPet = async (req: Request, res: Response) => {
         //TODO: agrega el uid de la mascota creada al usuario respectivo
         const savedPet = await newPet.save();
 
-        if(usuario) usuario.pets = usuario.pets.concat(savedPet.id)
-
+        if(usuario) {
+            usuario.pets = usuario.pets.concat(savedPet.id);
+            await usuario.save();
+        }
+        
         
         return res.json({
             msg: "ok - Mascota registrada",
