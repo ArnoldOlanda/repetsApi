@@ -20,11 +20,11 @@ router.post   ('/:id',[
     check('id').custom( existeUsuarioId ),
     check('nombre','El campo es obligatorio').not().isEmpty(),
     check('tipo','El campo es obligatorio').not().isEmpty(),
-    check('tipo').isArray(),
-    check('tipo.*').isString(),
     check('raza','El campo es obligatorio').not().isEmpty(),
     check('edad','El campo es obligatorio').not().isEmpty(),
     check('descripcion','El campo es obligatorio').not().isEmpty(),
+    check('caracteristicas').isArray(),
+    check('caracteristicas.*').isString(),
     validarCampos //Captura todos los errores y los muestra
 ], postPet )
 
