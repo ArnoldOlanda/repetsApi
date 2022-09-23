@@ -24,6 +24,7 @@ const PetSchema = new Schema<IPet>({
         type: String,
         required: [true, "La raza es obligatoria"]
     },
+    edad:{ type: Number },
     caracteristicas: [{ type: String, }],
     img:{ type: String, },
 
