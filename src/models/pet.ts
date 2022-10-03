@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 
 interface IPet {
     nombre: string;
+    propietarioUid: Schema.Types.ObjectId ;
     tipo: string;
     raza: string;
     edad: number;
@@ -15,6 +16,11 @@ const PetSchema = new Schema<IPet>({
     nombre: {
         type: String,
         required: [true, "El nombre es obligatorio"],
+    },
+    propietarioUid: {
+        type: Schema.Types.ObjectId,
+        ref:'Usuario',
+        required: [true,"El propietario es obligatorio"]
     },
     tipo: {
         type: String,

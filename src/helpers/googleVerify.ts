@@ -11,7 +11,6 @@ export const  googleVerify = async( token: string ) => {
   });
   const payload = ticket.getPayload();
   
-  console.log( payload );
   return payload
   
   // If request specified a G Suite domain:

@@ -13,21 +13,25 @@ import { existePethouseId } from '../helpers/dbValidator';
 
 const router = Router();
 
-// router.get    ('/',[ validarJWT ], getUser )
-router.get    ('/', getPetHouse )
+
+router.get    ('/:lat/:long', getPetHouse )
 
 
 router.post   ('/',[
+    check('nombre').not().isEmpty(),
     check('distrito','El campo es obligatorio').not().isEmpty(),
     check('provincia','El campo es obligatorio').not().isEmpty(),
     check('direccion','El campo es obligatorio').not().isEmpty(),
     check('coordenadas','El campo debe ser un objeto').isObject(),
-    check('celular','El campo debe contener al menos 9 digitos').isLength({ min:9 }),
     check('propietario','El campo es obligatorio').not().isEmpty(),
-    check('tarifa_hora','El campo es obligatorio').not().isEmpty(),
-    check('tarifa_dia','El campo es obligatorio').not().isEmpty(),
+    check('celular','El campo debe contener al menos 9 digitos').isLength({ min:9 }),
+    check('correo').isEmail(),
+    check('password').not().isEmpty(),
+    // check('tarifa_hora','El campo es obligatorio').not().isEmpty(),
+    // check('tarifa_dia','El campo es obligatorio').not().isEmpty(),
     check('categorias','El campo debe ser un arreglo').isArray(),
     check('categorias.*','El campo debe ser un ID valido').isMongoId(),
+    check('galeria').isArray(),
     validarCampos //Captura todos los errores y los muestra
 ], postPetHouse )
 

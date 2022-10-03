@@ -3,8 +3,8 @@ import { Request, Response } from "express";
 import Pet from "../models/pet";
 import Usuario from "../models/usuario"
 
-export const getPets = async (_req: Request, res: Response) => {
-    const data = _req
+export const getPets = async (req: Request, res: Response) => {
+    const { id } = req.params
 
     try {
         const data = await Pet.find();
@@ -16,33 +16,42 @@ export const getPets = async (_req: Request, res: Response) => {
         console.log( error );
         throw error;    
     }
-
 }
+export const getUserPets = async (req: Request, res: Response) => {
+    try {
+        
+        const { id } = req.params
+        const pets = await Pet.find({ propietarioUid: id });
+        
+        return res.json({
+            data: pets
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            err: "Error al obtener la informacion, hable con el administrador"
+        })
+    }
+}
+
+
 // Registrar nuevo usuario
 export const postPet = async (req: Request, res: Response) => {
 
     try {
-        const { id } = req.params;
         const data = req.body;
-        
-        const usuario = await Usuario.findById(id);
         const newPet = new Pet( data );
 
-        //TODO: agrega el uid de la mascota creada al usuario respectivo
         const savedPet = await newPet.save();
 
-        if(usuario) {
-            usuario.pets = usuario.pets.concat(savedPet.id);
-            await usuario.save();
-        }
-        
-        
         return res.json({
             msg: "ok - Mascota registrada",
-            pet: newPet,
+            pet: savedPet,
         })
 
     } catch (error) {
+        console.log(error);
         return res.status(400).json({
             err: "Error al registrar, hable con el administrador"
         })

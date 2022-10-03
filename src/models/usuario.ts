@@ -11,7 +11,6 @@ interface IUser {
     estado: boolean;
     google: boolean;
     favoritos: Schema.Types.ObjectId[];
-    pets:Schema.Types.ObjectId[];
 }
 
 
@@ -54,11 +53,7 @@ const UsuarioSchema = new Schema<IUser>({
     favoritos:[{
         type: Schema.Types.ObjectId,
         ref: 'PetHouse'
-    }],
-    pets:[{
-        type: Schema.Types.ObjectId,
-        ref: 'Pet'
-    }]  
+    }], 
 });
 
 UsuarioSchema.methods.toJSON = function () {

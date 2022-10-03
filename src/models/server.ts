@@ -2,6 +2,8 @@ import express, { Application } from 'express'
 import server from 'http'
 import io from 'socket.io'
 import cors from 'cors'
+import { v2 as cloudinary} from 'cloudinary'
+import fileUpload from 'express-fileupload'
 
 import routerUsers from '../routes/users'
 import routerAuth from '../routes/auth'
@@ -42,6 +44,7 @@ class Server {
     petHousePath: string;
     categoriaPath: string;
     petsPath: string;
+    cloudinary: any;
 
     constructor() {
         this.app = express();
@@ -55,6 +58,12 @@ class Server {
         this.petHousePath = '/api/petHouses';
         this.categoriaPath = '/api/categorias';
         this.petsPath = '/api/pets';
+        // this.cloudinary = cloudinary.config('cloudinary://481341799119962:lzC93GPjH1M_5ICS2XCgf4OR06s@dvoo0vvff')
+        this.cloudinary = cloudinary.config({
+            cloud_name:`${process.env.CLOUDINARY_NAME}`,
+            api_key: `${process.env.CLOUDINARY_API_KEY}`,
+            api_secret:process.env.CLOUDINARY_API_SECRET,
+        });
 
         //Conectar a base de datos
         this.conectarDB()
@@ -80,6 +89,12 @@ class Server {
 
         //Public folder
         this.app.use(express.static("public"))
+
+        //Carga de archivos - imagenes
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/'
+        }));
 
     }
 

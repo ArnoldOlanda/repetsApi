@@ -8,7 +8,8 @@ import {
     postUser,
     patchVerifyNewUser,
     deleteUser, 
-    putUser
+    putUser,
+    updatePhotoUser
 } from '../services/users';
 
 
@@ -16,6 +17,7 @@ const router = Router();
 
 // router.get    ('/',[ validarJWT ], getUser )
 router.get    ('/', getUser )
+
 
 
 router.post   ('/',[
@@ -50,6 +52,12 @@ router.put('/:id',[
     check('correo').custom(emailExiste),
     validarCampos
 ] ,putUser);
+
+router.put('/photo/:id',[
+  check('id').isMongoId(),
+  check('id').custom( existeUsuarioId ),
+  validarCampos
+],updatePhotoUser);
 
 router.delete ('/:id',[
     //@ts-ignore

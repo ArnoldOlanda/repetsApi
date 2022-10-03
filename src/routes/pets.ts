@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { check } from 'express-validator'
-import { deletePet, getPets, postPet, putPet } from '../services/pets';
+import { deletePet, getPets, getUserPets, postPet, putPet } from '../services/pets';
 
 
 import { 
@@ -14,10 +14,15 @@ const router = Router();
 // router.get    ('/',[ validarJWT ], getUser )
 router.get    ('/', getPets )
 
-
-router.post   ('/:id',[
+router.get('/:id',[
     check('id').isMongoId(),
     check('id').custom( existeUsuarioId ),
+    validarCampos,
+], getUserPets )
+
+router.post   ('/',[
+    check('propietarioUid').isMongoId(),
+    check('propietarioUid').custom( existeUsuarioId ),
     check('nombre','El campo es obligatorio').not().isEmpty(),
     check('tipo','El campo es obligatorio').not().isEmpty(),
     check('raza','El campo es obligatorio').not().isEmpty(),
