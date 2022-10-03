@@ -146,6 +146,14 @@ export const updatePhotoUser = async (req: Request, res: Response) => {
 
         const user = await Usuario.findById( id );
 
+        if(user?.img){
+            const nombreArr = user?.img.split('/');
+            const nombre = nombreArr[nombreArr.length-1];
+            const [public_id] = nombre.split('.');
+
+            cloudinary.uploader.destroy( public_id );
+        }
+
         //const nombre = await uploadFiles( req ); sube el archivo de forma local al servidor
         const image = req.files.image as fileUpload.UploadedFile;
 
