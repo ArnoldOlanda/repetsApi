@@ -132,7 +132,7 @@ export const putUser = async (req: Request, res: Response) => {
 export const updatePhotoUser = async (req: Request, res: Response) => {
 
     const { id } = req.params
-
+    
     try {
         if (!req.files || Object.keys(req.files).length === 0) {
             res.status(400).json({ msg: 'No hay imagen para subir.' });
