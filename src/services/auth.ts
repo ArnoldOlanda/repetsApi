@@ -52,15 +52,14 @@ export const googleSignIn = async (req: Request, res: Response ) =>{
 
     try {
 
-        const { name,email,picture, ...resto } = await googleVerify( id_token );
-
-        console.log(resto);
+        const { given_name,email,picture, family_name } = await googleVerify( id_token );
         
         let usuario = await Usuario.findOne({ correo:email })
 
         if(!usuario){
             const data = {
-                nombre:name,
+                nombre: given_name,
+                apellido: family_name,
                 correo:email,
                 password:':v',
                 img:picture,
