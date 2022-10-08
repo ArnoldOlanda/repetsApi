@@ -75,6 +75,7 @@ export const postUser = async (req: Request, res: Response) => {
 
 }
 
+//Activar cuenta de nuevo usuario
 export const patchVerifyNewUser = async (req: Request, res: Response) => {
     try {
         const { id, generateCode, givenCode } = req.body
@@ -106,6 +107,7 @@ export const patchVerifyNewUser = async (req: Request, res: Response) => {
     }
 }
 
+// Actualizar datos de usuario
 export const putUser = async (req: Request, res: Response) => {
 
 
@@ -129,6 +131,7 @@ export const putUser = async (req: Request, res: Response) => {
 
 }
 
+// Actualizar imagen de usuario
 export const updatePhotoUser = async (req: Request, res: Response) => {
 
     const { id } = req.params
@@ -178,6 +181,7 @@ export const updatePhotoUser = async (req: Request, res: Response) => {
 
 }
 
+//Eliminar usuario
 export const deleteUser = async (req: Request, res: Response) => {
     const { id } = req.params
 

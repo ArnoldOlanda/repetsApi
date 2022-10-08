@@ -17,19 +17,19 @@ export const login = async ( req: Request, res: Response )  =>{
         const usuarioDb = await Usuario.findOne({ correo: usuario })  
 
         if( !usuarioDb ) return res.status(400).json({
-              msg:'El usuario no existe'
+              msg:'Este usuario no existe'
         })
 
         //Si el usuario esta activo
         if (usuarioDb.estado === false) return res.status(400).json({
-            msg:'Este usuario no esta registrado '
+            msg:'Este usuario no se encuentra registrado '
         })
         
         //Verificar el password
         const validaPassword = bcryptjs.compareSync( password, usuarioDb.password );
 
         if(!validaPassword) return res.status(400).json({
-              msg:'El password es incorrecto'
+              msg:'Password incorrecto'
         })
         // Generar el jwt
         const token = await generarJWT(usuarioDb.id)
@@ -41,7 +41,7 @@ export const login = async ( req: Request, res: Response )  =>{
     } catch (error) {
         console.log( error );
         return res.status(500).json({
-            msg: 'Error al loguear, hable con el administrador'
+            msg: 'Ha ocurrido un error, hable con el administrador'
         })
     }
 
@@ -52,8 +52,10 @@ export const googleSignIn = async (req: Request, res: Response ) =>{
 
     try {
 
-        const { name,email,picture } = await googleVerify( id_token );
+        const { name,email,picture, ...resto } = await googleVerify( id_token );
 
+        console.log(resto);
+        
         let usuario = await Usuario.findOne({ correo:email })
 
         if(!usuario){
