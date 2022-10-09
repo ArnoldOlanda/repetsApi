@@ -61,6 +61,7 @@ export const updateGalleryPetHouse = async (req: Request, res: Response) => {
         const pethouse = await PetHouse.findById(id);
 
         if (pethouse) {
+
             //TODO: eliminar las fotos de la pethouse antiguas
             //const nombre = await uploadFiles( req ); sube el archivo de forma local al servidor
             const image = req.files.image as fileUpload.UploadedFile;
