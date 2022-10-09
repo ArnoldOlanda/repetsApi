@@ -14,11 +14,12 @@ interface IPetHouse {
     coordenadas: Coordendas;
     celular: string;
     propietario: string;
-    img: string[];
+    galeria: string[];
     tarifa_dia: number;
     tarifa_hora: number;
     calificacion: number; // 1 al 5
     categorias: Schema.Types.ObjectId[];
+    tipo_alojamiento: string;
     estado: boolean;
 }
 
@@ -36,7 +37,7 @@ const PetHouseSchema = new Schema<IPetHouse>({
     },
     direccion:{
         type: String,
-        required: [true, "La direccion es obligatoria"]
+        //required: [true, "La direccion es obligatoria"]
     },
     coordenadas:{
         latitud: {
@@ -50,21 +51,25 @@ const PetHouseSchema = new Schema<IPetHouse>({
     },
     celular: {
         type: String,
-        required: [true, "El celular es obligatorio"],
+        //required: [true, "El celular es obligatorio"],
     },
     propietario: {
         type: String,
         required: [true, 'El nombre del propietario es obligatorio']
     },
-    img:[{ type: String }],
+    galeria:[{ type: String }],
     tarifa_dia:{ type: Number, },
-    tarifa_hora:{ type: Number, required:true },
+    tarifa_hora:{ 
+        type: Number, 
+        // required:true 
+    },
     calificacion:{ type: Number },
     categorias:[{
         type: Schema.Types.ObjectId,
         ref:'Categoria',
         required: true
     }],
+    tipo_alojamiento: { type: String, required: true },
     estado:{
         type: Boolean,
         default: true,

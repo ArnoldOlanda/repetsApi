@@ -47,7 +47,11 @@ const UsuarioSchema = new mongoose_1.Schema({
     google: {
         type: Boolean,
         default: false
-    }
+    },
+    favoritos: [{
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: 'PetHouse'
+        }],
 });
 UsuarioSchema.methods.toJSON = function () {
     const _a = this.toObject(), { __v, password, _id } = _a, usuario = __rest(_a, ["__v", "password", "_id"]);

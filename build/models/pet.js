@@ -17,16 +17,21 @@ const PetSchema = new mongoose_1.Schema({
         type: String,
         required: [true, "El nombre es obligatorio"],
     },
-    especie: {
+    propietarioUid: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Usuario',
+        required: [true, "El propietario es obligatorio"]
+    },
+    tipo: {
         type: String,
-        required: [true, "La especie es obligatoria"],
+        required: [true, "El tipo de mascota es obligatoria"],
     },
     raza: {
         type: String,
         required: [true, "La raza es obligatoria"]
     },
-    comportamiento: [{ type: String, }],
-    tamaño: { type: String, },
+    edad: { type: Number },
+    caracteristicas: [{ type: String, }],
     img: { type: String, },
 });
 PetSchema.methods.toJSON = function () {

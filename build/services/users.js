@@ -23,8 +23,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.putUser = exports.patchVerifyNewUser = exports.postUser = exports.getUser = void 0;
+exports.deleteUser = exports.updatePhotoUser = exports.putUser = exports.patchVerifyNewUser = exports.postUser = exports.getUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const cloudinary_1 = require("cloudinary");
 const generateVerifyCode_1 = require("../helpers/generateVerifyCode");
 const sendMail_1 = require("../helpers/sendMail");
 const usuario_1 = __importDefault(require("../models/usuario"));
@@ -68,6 +69,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.postUser = postUser;
+//Activar cuenta de nuevo usuario
 const patchVerifyNewUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id, generateCode, givenCode } = req.body;
@@ -95,6 +97,7 @@ const patchVerifyNewUser = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.patchVerifyNewUser = patchVerifyNewUser;
+// Actualizar datos de usuario
 const putUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const data = req.body;
@@ -113,6 +116,45 @@ const putUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.putUser = putUser;
+// Actualizar imagen de usuario
+const updatePhotoUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    try {
+        if (!req.files || Object.keys(req.files).length === 0) {
+            res.status(400).json({ msg: 'No hay imagen para subir.' });
+            return;
+        }
+        if (!req.files.image || Object.keys(req.files).length === 0) {
+            res.status(400).json({ msg: 'No hay imagen para subir.' });
+            return;
+        }
+        const user = yield usuario_1.default.findById(id);
+        if (user) {
+            if (user.img) {
+                const nombreArr = user.img.split('/');
+                const nombre = nombreArr[nombreArr.length - 1];
+                const [public_id] = nombre.split('.');
+                cloudinary_1.v2.uploader.destroy('repets-app/usuarios/' + public_id);
+            }
+            //const nombre = await uploadFiles( req ); sube el archivo de forma local al servidor
+            const image = req.files.image;
+            const { secure_url } = yield cloudinary_1.v2.uploader.upload(image.tempFilePath, { folder: 'repets-app/usuarios' });
+            user.img = secure_url;
+            yield user.save();
+        }
+        return res.json({
+            user
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            err: 'Ocurrio un error'
+        });
+    }
+});
+exports.updatePhotoUser = updatePhotoUser;
+//Eliminar usuario
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {

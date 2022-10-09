@@ -1,13 +1,13 @@
 import { Router } from 'express'
 import { check } from 'express-validator'
-import { deletePetHouse, getPetHouse,postPetHouse, putPetHouse } from '../services/petHouses';
+import { deletePetHouse, getPetHouse,postPetHouse, putPetHouse, updateGalleryPetHouse } from '../services/petHouses';
 
 
 import { 
     //validarJWT, 
     validarCampos
 } from '../middlewares'
-import { existePethouseId } from '../helpers/dbValidator';
+import { existePethouseId, existeUsuarioId } from '../helpers/dbValidator';
 
 
 
@@ -21,19 +21,23 @@ router.post   ('/',[
     check('nombre').not().isEmpty(),
     check('distrito','El campo es obligatorio').not().isEmpty(),
     check('provincia','El campo es obligatorio').not().isEmpty(),
-    check('direccion','El campo es obligatorio').not().isEmpty(),
     check('coordenadas','El campo debe ser un objeto').isObject(),
     check('propietario','El campo es obligatorio').not().isEmpty(),
-    check('celular','El campo debe contener al menos 9 digitos').isLength({ min:9 }),
-    check('correo').isEmail(),
-    check('password').not().isEmpty(),
-    // check('tarifa_hora','El campo es obligatorio').not().isEmpty(),
-    // check('tarifa_dia','El campo es obligatorio').not().isEmpty(),
     check('categorias','El campo debe ser un arreglo').isArray(),
     check('categorias.*','El campo debe ser un ID valido').isMongoId(),
-    check('galeria').isArray(),
+    check('tipo_alojamiento','El campo es obligatorio').not().isEmpty(),
+    //check('direccion','El campo es obligatorio').not().isEmpty(),
+    // check('celular','El campo debe contener al menos 9 digitos').isLength({ min:9 }),
+    // check('tarifa_hora','El campo es obligatorio').not().isEmpty(),
+    // check('tarifa_dia','El campo es obligatorio').not().isEmpty(),
     validarCampos //Captura todos los errores y los muestra
 ], postPetHouse )
+
+router.put('/:id',[
+    check('id').isMongoId(),
+    //check('id').custom( existeUsuarioId ), //TODO: validar si la pethouse existe
+    validarCampos
+],updateGalleryPetHouse)
 
 router.put   ('/:id',[
     check('id','No es un id valido').isMongoId(),

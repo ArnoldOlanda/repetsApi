@@ -38,6 +38,11 @@ router.put('/:id', [
     (0, express_validator_1.check)('correo').custom(dbValidator_1.emailExiste),
     middlewares_1.validarCampos
 ], users_1.putUser);
+router.put('/photo/:id', [
+    (0, express_validator_1.check)('id').isMongoId(),
+    (0, express_validator_1.check)('id').custom(dbValidator_1.existeUsuarioId),
+    middlewares_1.validarCampos
+], users_1.updatePhotoUser);
 router.delete('/:id', [
     //@ts-ignore
     middlewares_1.validarJWT,

@@ -13,16 +13,6 @@ import fileUpload from "express-fileupload";
 
 
 
-
-// cloudinary.config({
-//     cloud_name:process.env.CLOUDINARY_NAME,
-//     api_key: process.env.CLOUDINARY_API_KEY,
-//     api_secret:process.env.LOUDINARY_API_SECRET,
-// });
-
-
-//cloudinary.config('cloudinary://481341799119962:lzC93GPjH1M_5ICS2XCgf4OR06s@dvoo0vvff')
-
 export const getUser = async (_req: Request, res: Response) => {
     const data = _req
 

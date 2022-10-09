@@ -25,7 +25,7 @@ const PetHouseSchema = new mongoose_1.Schema({
     },
     direccion: {
         type: String,
-        required: [true, "La direccion es obligatoria"]
+        //required: [true, "La direccion es obligatoria"]
     },
     coordenadas: {
         latitud: {
@@ -39,13 +39,13 @@ const PetHouseSchema = new mongoose_1.Schema({
     },
     celular: {
         type: String,
-        required: [true, "El celular es obligatorio"],
+        //required: [true, "El celular es obligatorio"],
     },
     propietario: {
         type: String,
         required: [true, 'El nombre del propietario es obligatorio']
     },
-    img: [{ type: String }],
+    galeria: [{ type: String }],
     tarifa_dia: { type: Number, },
     tarifa_hora: { type: Number, required: true },
     calificacion: { type: Number },
@@ -54,6 +54,7 @@ const PetHouseSchema = new mongoose_1.Schema({
             ref: 'Categoria',
             required: true
         }],
+    tipo_alojamiento: { type: String, required: true },
     estado: {
         type: Boolean,
         default: true,

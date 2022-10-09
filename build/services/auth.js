@@ -24,18 +24,18 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const usuarioDb = yield usuario_1.default.findOne({ correo: usuario });
         if (!usuarioDb)
             return res.status(400).json({
-                msg: 'El usuario no existe'
+                msg: 'Este usuario no existe'
             });
         //Si el usuario esta activo
         if (usuarioDb.estado === false)
             return res.status(400).json({
-                msg: 'Este usuario no esta registrado '
+                msg: 'Este usuario no se encuentra registrado '
             });
         //Verificar el password
         const validaPassword = bcryptjs_1.default.compareSync(password, usuarioDb.password);
         if (!validaPassword)
             return res.status(400).json({
-                msg: 'El password es incorrecto'
+                msg: 'Password incorrecto'
             });
         // Generar el jwt
         const token = yield (0, generarJWT_1.generarJWT)(usuarioDb.id);
@@ -47,7 +47,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     catch (error) {
         console.log(error);
         return res.status(500).json({
-            msg: 'Error al loguear, hable con el administrador'
+            msg: 'Ha ocurrido un error, hable con el administrador'
         });
     }
 });
@@ -55,11 +55,12 @@ exports.login = login;
 const googleSignIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id_token } = req.body;
     try {
-        const { name, email, picture } = yield (0, googleVerify_1.googleVerify)(id_token);
+        const { given_name, email, picture, family_name } = yield (0, googleVerify_1.googleVerify)(id_token);
         let usuario = yield usuario_1.default.findOne({ correo: email });
         if (!usuario) {
             const data = {
-                nombre: name,
+                nombre: given_name,
+                apellido: family_name,
                 correo: email,
                 password: ':v',
                 img: picture,

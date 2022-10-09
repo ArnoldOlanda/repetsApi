@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.googleVerify = void 0;
 const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID_ANDROID);
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const googleVerify = (token) => __awaiter(void 0, void 0, void 0, function* () {
     const ticket = yield client.verifyIdToken({
         idToken: token,
@@ -20,7 +20,6 @@ const googleVerify = (token) => __awaiter(void 0, void 0, void 0, function* () {
         //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
     });
     const payload = ticket.getPayload();
-    console.log(payload);
     return payload;
     // If request specified a G Suite domain:
     // const domain = payload['hd'];
