@@ -1,6 +1,6 @@
 import express, { Application } from 'express'
 import server from 'http'
-import io from 'socket.io'
+import io, { Socket } from 'socket.io'
 import cors from 'cors'
 import { v2 as cloudinary} from 'cloudinary'
 import fileUpload from 'express-fileupload'
@@ -12,6 +12,7 @@ import routerCategorias from '../routes/categorias'
 import routerPets from '../routes/pets'
 
 import { dbConnection } from '../database/config';
+import { socketsController } from '../../sockets/socketsController'
 
 interface ServerToClientEvents {
     noArg: () => void;
@@ -110,19 +111,7 @@ class Server {
     }
 
     sockets() {
-        this.io.on("connection",(socket: any ) => {
-            console.log(`Nueva conexion de: ${ socket.id }`);
-            
-
-            socket.on("hello",(payload: any)=>{
-                console.log("saludo", payload);
-                socket.emit('devolver-saludo',{ respuesta: 'que tal' })
-            })
-
-            socket.on("disconnect",() => {
-                console.log("Conexion cerrada");
-            })
-        })
+        this.io.on("connection",socketsController)
     }
 
     listen() {
