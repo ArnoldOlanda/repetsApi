@@ -40,6 +40,6 @@ export const socketsController = (socket: any ) => {
     })
 
     socket.on("disconnect",() => {
-        console.log("Conexion cerrada");
+        console.log("Conexion cerrada: ", socket.id);
     })
 }
