@@ -12,7 +12,7 @@ import routerCategorias from '../routes/categorias'
 import routerPets from '../routes/pets'
 
 import { dbConnection } from '../database/config';
-import { socketsController } from '../../sockets/socketsController'
+import { socketsController } from '../sockets/socketsController'
 
 interface ServerToClientEvents {
     noArg: () => void;
