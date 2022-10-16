@@ -69,8 +69,6 @@ export const googleSignIn = async (req: Request, res: Response ) =>{
             }
             usuario = new Usuario(data);
 
-            console.log(usuario);
-
             await usuario.save();
         }
 

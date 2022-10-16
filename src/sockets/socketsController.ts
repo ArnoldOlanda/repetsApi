@@ -1,40 +1,78 @@
 
+import { Schema } from 'mongoose';
+import { Socket } from 'socket.io';
+import Chat from '../models/chat';
 import Mensaje from '../models/mensaje'
 interface IPayloadGetChats{
     uid: string;
 }
 
+interface IPayloadSendMessage{
+    fecha: Date;
+    emisor: Schema.Types.ObjectId;
+    destinatario: Schema.Types.ObjectId;
+    mensaje: string; 
+}
 
-export const socketsController = (socket: any ) => {
+//@ts-ignore
+export const socketsController = (socket = new Socket() ) => {
 
     console.log(`Nueva conexion de: ${ socket.id }`);
     
-    socket.on('get-chats',(payload: IPayloadGetChats) => {
+    socket.on('get-chats', async (payload: IPayloadGetChats) => {
         const { uid } = payload;
 
         console.log({usuario: uid});
-        socket.emit("send-chats",{data:'aqui van los chats del usuario'})
+
+        const chats = await Chat.findById( uid )
+
+        socket.emit("send-chats", chats )
         
     })
 
-    socket.on('enviar-mensaje-global', async (payload: any) => {
+    socket.on('enviar-mensaje-global', async (payload: IPayloadSendMessage) => {
 
-        const newMensaje = new Mensaje({
-            fecha: new Date(),
-            mensaje: payload.mensaje
-        })
-        await newMensaje.save()
+        const { emisor, destinatario, mensaje } = payload
 
-        const mensajes = await Mensaje.find();
+        try {
+            const newMensaje = new Mensaje({
+                fecha: new Date(),
+                emisor,
+                destinatario,
+                mensaje
+            })
+            const savedMensaje = await newMensaje.save();
+            const chatEmisor = await Chat.findById( emisor );
+            const chatDestinatario = await Chat.findById( destinatario );
 
-        socket.broadcast.emit( 'actualizar-mensajes', mensajes )
+            if( chatEmisor ) 
+                chatEmisor.mensajes = chatEmisor.mensajes.concat(savedMensaje.id)
+
+            if( chatDestinatario ) 
+                chatDestinatario.mensajes = chatDestinatario.mensajes.concat(savedMensaje.id)
+
+    
+            const mensajes = await Mensaje.find()
+                .populate('emisor',{ nombre: 1, apellido: 1 })
+                .populate('destinatario',{ nombre: 1, apellido: 1 })
+            
+            socket.broadcast.emit( 'actualizar-mensajes', mensajes )
+            
+        } catch (error) {
+            console.log(error);
+        }
+
 
     })
 
+
     socket.on('get-mensajes-global', async () => {
 
+        // const mensajes = await Mensaje.find()
         const mensajes = await Mensaje.find()
-
+            .populate('emisor',{ nombre: 1, apellido: 1 })
+            .populate('destinatario',{ nombre: 1, apellido: 1 });
+        
         socket.emit('recibir-mensajes', mensajes )
 
     })
