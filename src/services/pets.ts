@@ -1,5 +1,8 @@
 
 import { Request, Response } from "express";
+import { v2 as cloudinary} from 'cloudinary'
+import fileUpload from "express-fileupload";
+
 import Pet from "../models/pet";
 import Usuario from "../models/usuario"
 
@@ -59,6 +62,53 @@ export const postPet = async (req: Request, res: Response) => {
 
 }
 
+export const updateImagePet = async( req:Request, res:Response ) => {
+    const { id } = req.params
+    
+    try {
+
+        if (!req.files || Object.keys(req.files).length === 0) {
+            res.status(400).json({ msg: 'No hay imagen para subir.' });
+            return;
+        }
+
+        if (!req.files.image || Object.keys(req.files).length === 0) {
+            res.status(400).json({ msg: 'No hay imagen para subir.' });
+            return;
+        }
+
+        const pet = await Pet.findById( id );
+
+        if(pet){
+
+            if(pet.img){
+                const nombreArr = pet.img.split('/');
+                const nombre = nombreArr[nombreArr.length-1];
+                const [public_id] = nombre.split('.');
+                
+                cloudinary.uploader.destroy( 'repets-app/pets/' + public_id ); //Eliminar la imagen si existe
+            }
+    
+            const image = req.files.image as fileUpload.UploadedFile;
+    
+            const { secure_url } = await cloudinary.uploader.upload(image.tempFilePath,{folder:'repets-app/pets'})
+    
+            pet.img = secure_url
+            await pet.save();
+            
+        }
+
+        return res.json({
+            pet
+        })
+    } catch (error) {
+        console.log(error);
+        
+        return res.status(500).json({
+            err:'Ocurrio un error'
+        })
+    }
+}
 
 export const putPet = async( req:Request, res: Response ) => {
 

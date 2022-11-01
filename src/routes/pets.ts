@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { check } from 'express-validator'
-import { deletePet, getPets, getUserPets, postPet, putPet } from '../services/pets';
+import { deletePet, getPets, getUserPets, postPet, putPet, updateImagePet } from '../services/pets';
 
 
 import { 
@@ -48,8 +48,9 @@ router.put   ('/:id',[
 
 router.patch('/updateImage/:id',[
     check('id','El campo debe ser un id valido').isMongoId(),
-    //TODO: terminar la implementacion del servicio de actualizacion de imagen
-],)
+    check('id','El id no es valido').custom( existePetId ),
+    validarCampos
+],updateImagePet)
 
 
 router.delete ('/:id',[

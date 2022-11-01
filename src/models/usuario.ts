@@ -12,6 +12,7 @@ interface IUser {
     google: boolean;
     favoritos: Schema.Types.ObjectId[];
     pethouse: Schema.Types.ObjectId;
+    notification_token: string;
 }
 
 
@@ -58,6 +59,9 @@ const UsuarioSchema = new Schema<IUser>({
     pethouse:{
         type: Schema.Types.ObjectId,
         ref:'PetHouse'
+    },
+    notification_token:{
+        type: String
     } 
 });
 

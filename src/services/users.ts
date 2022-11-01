@@ -171,6 +171,30 @@ export const updatePhotoUser = async (req: Request, res: Response) => {
 
 }
 
+export const setNotificationToken = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params
+        const { token } = req.body
+
+        const user = await Usuario.findByIdAndUpdate(id,{ notification_token: token })
+
+        if (!user) {
+            return res.status(400).json({
+                err: "Error al actualizar el token, hable con el administrador"
+            })
+        }
+        return res.json({
+            msg: "Token actualizado"
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            err: "Error al actualizar el token, hable con el administrador"
+        })
+    }
+}
+
 //Eliminar usuario
 export const deleteUser = async (req: Request, res: Response) => {
     const { id } = req.params

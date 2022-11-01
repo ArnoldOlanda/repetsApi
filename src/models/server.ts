@@ -1,6 +1,7 @@
 import express, { Application } from 'express'
 import server from 'http'
 import io, { Socket } from 'socket.io'
+import morgan from 'morgan'
 import cors from 'cors'
 import { v2 as cloudinary} from 'cloudinary'
 import fileUpload from 'express-fileupload'
@@ -90,6 +91,8 @@ class Server {
 
         //Public folder
         this.app.use(express.static("public"))
+
+        this.app.use(morgan('dev'))
 
         //Carga de archivos - imagenes
         this.app.use(fileUpload({

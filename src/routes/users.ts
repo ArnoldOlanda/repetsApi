@@ -9,7 +9,8 @@ import {
     patchVerifyNewUser,
     deleteUser, 
     putUser,
-    updatePhotoUser
+    updatePhotoUser,
+    setNotificationToken
 } from '../services/users';
 
 
@@ -58,6 +59,13 @@ router.put('/photo/:id',[
   check('id').custom( existeUsuarioId ),
   validarCampos
 ],updatePhotoUser);
+
+router.put('/notification_token/:id',[
+    check('id').isMongoId(),
+    check('id').custom( existeUsuarioId ),
+    check('token').not().isEmpty(),
+    validarCampos
+],setNotificationToken)
 
 router.delete ('/:id',[
     //@ts-ignore
