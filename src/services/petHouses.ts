@@ -13,7 +13,7 @@ export const getPetHouse = async (_req: Request, res: Response) => {
         const data = await PetHouse.find()
             .populate('tipo_mascotas', { categoria: 1 })
             .populate('propietario',{ nombre: 1, apellido: 1 });
-
+            
         return res.json({
             data
         })
