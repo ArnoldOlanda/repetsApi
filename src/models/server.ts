@@ -57,7 +57,7 @@ class Server {
         this.indexPath = '/api';
         this.userPaths = '/api/usuarios';
         this.authPath = '/api/auth';
-        this.petHousePath = '/api/petHouses';
+        this.petHousePath = '/api/pethouses';
         this.categoriaPath = '/api/categorias';
         this.petsPath = '/api/pets';
         // this.cloudinary = cloudinary.config('cloudinary://481341799119962:lzC93GPjH1M_5ICS2XCgf4OR06s@dvoo0vvff')
