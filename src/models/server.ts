@@ -92,7 +92,7 @@ class Server {
         //Public folder
         this.app.use(express.static("public"))
 
-        this.app.use(morgan('dev'))
+        this.app.use(morgan('short'))
 
         //Carga de archivos - imagenes
         this.app.use(fileUpload({
