@@ -11,6 +11,7 @@ import routerAuth from '../routes/auth'
 import routerPetHouses from '../routes/petHouses'
 import routerCategorias from '../routes/categorias'
 import routerPets from '../routes/pets'
+import routerReservas from '../routes/reservas'
 
 import { dbConnection } from '../database/config';
 import { socketsController } from '../sockets/socketsController'
@@ -46,6 +47,7 @@ class Server {
     petHousePath: string;
     categoriaPath: string;
     petsPath: string;
+    reservaPath: string;
     cloudinary: any;
 
     constructor() {
@@ -60,7 +62,9 @@ class Server {
         this.petHousePath = '/api/pethouses';
         this.categoriaPath = '/api/categorias';
         this.petsPath = '/api/pets';
-        // this.cloudinary = cloudinary.config('cloudinary://481341799119962:lzC93GPjH1M_5ICS2XCgf4OR06s@dvoo0vvff')
+        this.reservaPath = '/api/reserva';
+        
+        //Cloudinary config
         this.cloudinary = cloudinary.config({
             cloud_name:`${process.env.CLOUDINARY_NAME}`,
             api_key: `${process.env.CLOUDINARY_API_KEY}`,
@@ -111,6 +115,7 @@ class Server {
         this.app.use(this.petHousePath, routerPetHouses)
         this.app.use(this.categoriaPath, routerCategorias)
         this.app.use(this.petsPath, routerPets)
+        this.app.use(this.reservaPath, routerReservas)
     }
 
     sockets() {

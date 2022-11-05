@@ -2,7 +2,7 @@ import Usuario from '../models/usuario'
 import Role from "../models/role";
 import Pethouse from '../models/petHouse'
 import Pet from '../models/pet'
-
+import Reserva from '../models/reserva';
 
 export const esRoleValido = async (rol:string) => {
 
@@ -45,4 +45,10 @@ export const existePetId = async( id: string ) => {
 
 }
 
+export const existeReservaId = async (id: string) => {
 
+    const existe = await Reserva.findById(id)
+
+    if(!existe) throw new Error(`No existe una reserva con id: ${ id }.`)
+
+}

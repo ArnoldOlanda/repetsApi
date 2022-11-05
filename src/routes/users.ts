@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { check } from 'express-validator'
 
-import { emailExiste, esRoleValido, existeUsuarioId } from '../helpers/dbValidator';
+import { emailExiste, esRoleValido, existePethouseId, existeUsuarioId } from '../helpers/dbValidator';
 import { validarJWT, validarCampos } from '../middlewares'
 import {
     getUser,
@@ -10,7 +10,8 @@ import {
     deleteUser, 
     putUser,
     updatePhotoUser,
-    setNotificationToken
+    setNotificationToken,
+    updateFavoritesPethouses
 } from '../services/users';
 
 
@@ -18,8 +19,6 @@ const router = Router();
 
 // router.get    ('/',[ validarJWT ], getUser )
 router.get    ('/', getUser )
-
-
 
 router.post   ('/',[
     check('nombre','El campo es obligatorio').not().isEmpty(),
@@ -66,6 +65,14 @@ router.put('/notification_token/:id',[
     check('token').not().isEmpty(),
     validarCampos
 ],setNotificationToken)
+
+router.put('/favorites/:id',[
+    check('id').isMongoId(),
+    check('id').custom( existeUsuarioId ),
+    check('pethouseId').isMongoId(),
+    check('pethouseId').custom( existePethouseId ),
+    validarCampos
+],updateFavoritesPethouses)
 
 router.delete ('/:id',[
     //@ts-ignore

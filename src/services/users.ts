@@ -195,6 +195,30 @@ export const setNotificationToken = async (req: Request, res: Response) => {
     }
 }
 
+export const updateFavoritesPethouses = async (req:Request,res:Response)=> {
+    try {
+        
+        const {id} = req.params
+        const {pethouseId} = req.body
+
+        const user = await Usuario.findById(id)
+
+        if (user) {
+            user.favoritos = user?.favoritos.concat(pethouseId)
+            await user.save()
+        }
+        return res.json({
+            msg: "Favoritos actualizado"
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            err: "Error al eliminar, hable con el administrador"
+        })
+    }
+}
+
 //Eliminar usuario
 export const deleteUser = async (req: Request, res: Response) => {
     const { id } = req.params
