@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.setNotificationToken = exports.updatePhotoUser = exports.putUser = exports.patchVerifyNewUser = exports.postUser = exports.getUser = void 0;
+exports.deleteUser = exports.updateFavoritesPethouses = exports.setNotificationToken = exports.updatePhotoUser = exports.putUser = exports.patchVerifyNewUser = exports.postUser = exports.getUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const cloudinary_1 = require("cloudinary");
 const generateVerifyCode_1 = require("../helpers/generateVerifyCode");
@@ -176,6 +176,27 @@ const setNotificationToken = (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.setNotificationToken = setNotificationToken;
+const updateFavoritesPethouses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { pethouseId } = req.body;
+        const user = yield usuario_1.default.findById(id);
+        if (user) {
+            user.favoritos = user === null || user === void 0 ? void 0 : user.favoritos.concat(pethouseId);
+            yield user.save();
+        }
+        return res.json({
+            msg: "Favoritos actualizado"
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            err: "Error al eliminar, hable con el administrador"
+        });
+    }
+});
+exports.updateFavoritesPethouses = updateFavoritesPethouses;
 //Eliminar usuario
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;

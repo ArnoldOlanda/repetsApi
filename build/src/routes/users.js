@@ -49,6 +49,13 @@ router.put('/notification_token/:id', [
     (0, express_validator_1.check)('token').not().isEmpty(),
     middlewares_1.validarCampos
 ], users_1.setNotificationToken);
+router.put('/favorites/:id', [
+    (0, express_validator_1.check)('id').isMongoId(),
+    (0, express_validator_1.check)('id').custom(dbValidator_1.existeUsuarioId),
+    (0, express_validator_1.check)('pethouseId').isMongoId(),
+    (0, express_validator_1.check)('pethouseId').custom(dbValidator_1.existePethouseId),
+    middlewares_1.validarCampos
+], users_1.updateFavoritesPethouses);
 router.delete('/:id', [
     //@ts-ignore
     middlewares_1.validarJWT,

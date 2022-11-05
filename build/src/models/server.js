@@ -24,6 +24,7 @@ const auth_1 = __importDefault(require("../routes/auth"));
 const petHouses_1 = __importDefault(require("../routes/petHouses"));
 const categorias_1 = __importDefault(require("../routes/categorias"));
 const pets_1 = __importDefault(require("../routes/pets"));
+const reservas_1 = __importDefault(require("../routes/reservas"));
 const config_1 = require("../database/config");
 const socketsController_1 = require("../sockets/socketsController");
 class Server {
@@ -38,7 +39,8 @@ class Server {
         this.petHousePath = '/api/pethouses';
         this.categoriaPath = '/api/categorias';
         this.petsPath = '/api/pets';
-        // this.cloudinary = cloudinary.config('cloudinary://481341799119962:lzC93GPjH1M_5ICS2XCgf4OR06s@dvoo0vvff')
+        this.reservaPath = '/api/reserva';
+        //Cloudinary config
         this.cloudinary = cloudinary_1.v2.config({
             cloud_name: `${process.env.CLOUDINARY_NAME}`,
             api_key: `${process.env.CLOUDINARY_API_KEY}`,
@@ -64,7 +66,7 @@ class Server {
         this.app.use(express_1.default.json());
         //Public folder
         this.app.use(express_1.default.static("public"));
-        this.app.use((0, morgan_1.default)('dev'));
+        this.app.use((0, morgan_1.default)('short'));
         //Carga de archivos - imagenes
         this.app.use((0, express_fileupload_1.default)({
             useTempFiles: true,
@@ -80,6 +82,7 @@ class Server {
         this.app.use(this.petHousePath, petHouses_1.default);
         this.app.use(this.categoriaPath, categorias_1.default);
         this.app.use(this.petsPath, pets_1.default);
+        this.app.use(this.reservaPath, reservas_1.default);
     }
     sockets() {
         this.io.on("connection", socketsController_1.socketsController);

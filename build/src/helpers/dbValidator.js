@@ -12,11 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.existePetId = exports.existePethouseId = exports.existeUsuarioId = exports.emailExiste = exports.esRoleValido = void 0;
+exports.existeReservaId = exports.existePetId = exports.existePethouseId = exports.existeUsuarioId = exports.emailExiste = exports.esRoleValido = void 0;
 const usuario_1 = __importDefault(require("../models/usuario"));
 const role_1 = __importDefault(require("../models/role"));
 const petHouse_1 = __importDefault(require("../models/petHouse"));
 const pet_1 = __importDefault(require("../models/pet"));
+const reserva_1 = __importDefault(require("../models/reserva"));
 const esRoleValido = (rol) => __awaiter(void 0, void 0, void 0, function* () {
     const existeRol = yield role_1.default.findOne({ rol });
     if (!existeRol) {
@@ -53,4 +54,10 @@ const existePetId = (id) => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error(`No existe la Mascota con id : ${id}.`);
 });
 exports.existePetId = existePetId;
+const existeReservaId = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const existe = yield reserva_1.default.findById(id);
+    if (!existe)
+        throw new Error(`No existe una reserva con id: ${id}.`);
+});
+exports.existeReservaId = existeReservaId;
 //# sourceMappingURL=dbValidator.js.map
