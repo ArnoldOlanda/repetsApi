@@ -204,7 +204,7 @@ export const updateFavoritesPethouses = async (req:Request,res:Response)=> {
         const user = await Usuario.findById(id)
 
         if (user) {
-            user.favoritos = user?.favoritos.concat(pethouseId)
+            user.favoritos = user.favoritos.concat(pethouseId)
             await user.save()
         }
         return res.json({

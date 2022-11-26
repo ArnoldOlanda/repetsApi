@@ -1,5 +1,9 @@
-import { Request, Response } from "express";
+import { json, Request, Response } from "express";
+import * as admin from 'firebase-admin';
+
 import Reserva from "../models/reserva";
+import Pethouse from "../models/petHouse";
+import Usuario from "../models/usuario";
 
 
 export const listadoReservas = async (_req: Request, res: Response) => {
@@ -42,10 +46,39 @@ export const obtenerReserva = async (req: Request, res: Response) => {
 export const registrarReserva = async (req: Request, res: Response) => {
 
     const { body } = req
+    const { pethouse } = body
     try {
+        const usuarioPethouse = await Pethouse.findById(pethouse)
+        const propietario = await Usuario.findById(usuarioPethouse?.propietario)
+
         const newReserva = new Reserva(body)
         const savedReserva = await newReserva.save()
         
+        if(propietario){
+            const message = {
+                    
+                notification: {
+                    body: "Tienes una nueva solicitud de reserva",
+                    title: "Nueva reserva",
+                },
+                data: { savedReserva: JSON.stringify(savedReserva), proyecto: "Repets App" },
+                apns: {
+                    payload: { aps: { 'mutable-content': 1 } },
+                    fcm_options: { image: 'image-url' },
+                },
+                android: { notification: { image: 'image-url' } },
+                token: propietario.notification_token
+            };
+    
+            await admin.messaging()
+                //@ts-ignore
+                .send(message)
+                .then(_response => {
+                    console.log("Notificacion enviada");
+                })
+                .catch(console.log)
+        }
+
         return res.json({
             data: savedReserva
         })

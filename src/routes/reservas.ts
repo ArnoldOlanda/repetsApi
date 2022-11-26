@@ -7,7 +7,7 @@ import {
     //validarJWT, 
     validarCampos
 } from '../middlewares'
-import { existePethouseId, existeReservaId, existeUsuarioId } from '../helpers/dbValidator';
+import { existePethouseId, existePetId, existeReservaId, existeUsuarioId } from '../helpers/dbValidator';
 import { actualizarEstadoReserva, listadoReservas, obtenerReserva, registrarReserva } from '../services/reservas';
 
 const router = Router();
@@ -20,13 +20,14 @@ router.get('/:id',[
 ],obtenerReserva)
 
 router.post    ('/',[
-    check('fecha_solicitud').isDate(),
-    check('fecha_reserva').isDate(),
+    check('fecha_solicitud').not().isEmpty(),
+    check('fecha_reserva').not().isEmpty(),
     check('usuario').isMongoId(),
     check('usuario').custom( existeUsuarioId ),
     check('pethouse').isMongoId(),
     check('pethouse').custom( existePethouseId ),
-    check('cantidad_mascotas').isNumeric(),
+    check('mascota').isMongoId(),
+    check('mascota').custom( existePetId ),
     check('costo_total').isNumeric(),
     validarCampos
 ],registrarReserva );
