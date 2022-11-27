@@ -40,7 +40,7 @@ router.patch('/verifyAccount',[
     validarCampos
 ],patchVerifyNewUser)
 
-router.put('/:id',[
+router.patch('/:id',[
     //@ts-ignore
     validarJWT,
     check('id','No es un ID valido').isMongoId(),
@@ -48,8 +48,8 @@ router.put('/:id',[
     check('nombre','El campo es obligatorio').not().isEmpty(),
     check('apellido','El campo es obligatorio').not().isEmpty(),
     check('celular','El campo es obligatorio').not().isEmpty(),
-    check('correo','No es un correo valido').isEmail(),
-    check('correo').custom(emailExiste),
+    // check('correo','No es un correo valido').isEmail(),
+    // check('correo').custom(emailExiste),
     validarCampos
 ] ,putUser);
 
