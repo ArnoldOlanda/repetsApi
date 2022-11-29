@@ -120,7 +120,7 @@ class Server {
         this.app.get('/android/apk',(_req:Request, res:Response)=>{
 
             try {
-                const file = path.join(__dirname,`../installers/repets-apk.apk`)
+                const file = path.join(__dirname,`../../installers/repets-apk.apk`)
                 res.sendFile(file)
             } catch (error) {
                 console.log(error);
