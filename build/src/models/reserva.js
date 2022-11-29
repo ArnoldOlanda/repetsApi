@@ -31,9 +31,9 @@ const ReservaSchema = new mongoose_1.Schema({
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'PetHouse'
     },
-    cantidad_mascotas: {
-        type: Number,
-        required: true
+    mascota: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Pet'
     },
     costo_total: {
         type: Number,

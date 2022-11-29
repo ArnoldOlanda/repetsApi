@@ -26,16 +26,16 @@ router.patch('/verifyAccount', [
     (0, express_validator_1.check)('givenCode', 'Este campo debe ser un numero').isNumeric(),
     middlewares_1.validarCampos
 ], users_1.patchVerifyNewUser);
-router.put('/:id', [
+router.patch('/:id', [
     //@ts-ignore
-    middlewares_1.validarJWT,
+    //validarJWT,
     (0, express_validator_1.check)('id', 'No es un ID valido').isMongoId(),
     (0, express_validator_1.check)('id').custom(dbValidator_1.existeUsuarioId),
     (0, express_validator_1.check)('nombre', 'El campo es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('apellido', 'El campo es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('celular', 'El campo es obligatorio').not().isEmpty(),
-    (0, express_validator_1.check)('correo', 'No es un correo valido').isEmail(),
-    (0, express_validator_1.check)('correo').custom(dbValidator_1.emailExiste),
+    // check('correo','No es un correo valido').isEmail(),
+    // check('correo').custom(emailExiste),
     middlewares_1.validarCampos
 ], users_1.putUser);
 router.put('/photo/:id', [

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,7 +36,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.actualizarEstadoReserva = exports.registrarReserva = exports.obtenerReserva = exports.listadoReservas = void 0;
+const admin = __importStar(require("firebase-admin"));
 const reserva_1 = __importDefault(require("../models/reserva"));
+const petHouse_1 = __importDefault(require("../models/petHouse"));
+const usuario_1 = __importDefault(require("../models/usuario"));
 const listadoReservas = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const reservas = yield reserva_1.default.find();
@@ -49,9 +75,34 @@ const obtenerReserva = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.obtenerReserva = obtenerReserva;
 const registrarReserva = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
+    const { pethouse } = body;
     try {
+        const usuarioPethouse = yield petHouse_1.default.findById(pethouse);
+        const propietario = yield usuario_1.default.findById(usuarioPethouse === null || usuarioPethouse === void 0 ? void 0 : usuarioPethouse.propietario);
         const newReserva = new reserva_1.default(body);
         const savedReserva = yield newReserva.save();
+        if (propietario) {
+            const message = {
+                notification: {
+                    body: "Tienes una nueva solicitud de reserva",
+                    title: "Nueva reserva",
+                },
+                data: { savedReserva: JSON.stringify(savedReserva), proyecto: "Repets App" },
+                apns: {
+                    payload: { aps: { 'mutable-content': 1 } },
+                    fcm_options: { image: 'image-url' },
+                },
+                android: { notification: { image: 'image-url' } },
+                token: propietario.notification_token
+            };
+            yield admin.messaging()
+                //@ts-ignore
+                .send(message)
+                .then(_response => {
+                console.log("Notificacion enviada");
+            })
+                .catch(console.log);
+        }
         return res.json({
             data: savedReserva
         });

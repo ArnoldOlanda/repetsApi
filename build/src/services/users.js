@@ -103,9 +103,11 @@ const putUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const data = req.body;
     try {
         const user = yield usuario_1.default.findByIdAndUpdate(id, data);
+        const updatedUser = yield usuario_1.default.findById(id);
+        console.log(updatedUser);
         return res.json({
             msg: "ok - Usuario actualizado",
-            usuario: user
+            usuario: updatedUser
         });
     }
     catch (error) {
@@ -182,7 +184,7 @@ const updateFavoritesPethouses = (req, res) => __awaiter(void 0, void 0, void 0,
         const { pethouseId } = req.body;
         const user = yield usuario_1.default.findById(id);
         if (user) {
-            user.favoritos = user === null || user === void 0 ? void 0 : user.favoritos.concat(pethouseId);
+            user.favoritos = user.favoritos.concat(pethouseId);
             yield user.save();
         }
         return res.json({

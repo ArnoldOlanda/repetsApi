@@ -42,7 +42,7 @@ router.patch('/verifyAccount',[
 
 router.patch('/:id',[
     //@ts-ignore
-    validarJWT,
+    //validarJWT,
     check('id','No es un ID valido').isMongoId(),
     check('id').custom( existeUsuarioId ),
     check('nombre','El campo es obligatorio').not().isEmpty(),

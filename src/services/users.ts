@@ -105,11 +105,15 @@ export const putUser = async (req: Request, res: Response) => {
     const data = req.body
 
     try {
-        const user = await Usuario.findByIdAndUpdate(id, data);
 
+        const user = await Usuario.findByIdAndUpdate(id, data);
+        const updatedUser = await Usuario.findById(id);
+
+        console.log(updatedUser);
+        
         return res.json({
             msg: "ok - Usuario actualizado",
-            usuario: user
+            usuario: updatedUser
         })
 
     } catch (error) {
