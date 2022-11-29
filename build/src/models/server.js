@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const path_1 = __importDefault(require("path"));
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = __importDefault(require("socket.io"));
 const morgan_1 = __importDefault(require("morgan"));
@@ -84,18 +83,6 @@ class Server {
         this.app.use(this.categoriaPath, categorias_1.default);
         this.app.use(this.petsPath, pets_1.default);
         this.app.use(this.reservaPath, reservas_1.default);
-        this.app.get('/android/apk', (_req, res) => {
-            try {
-                const file = path_1.default.join(__dirname, `../../installers/repets-apk.apk`);
-                res.sendFile(file);
-            }
-            catch (error) {
-                console.log(error);
-                res.status(404).json({
-                    err: "Archivo no encontrado"
-                });
-            }
-        });
     }
     sockets() {
         this.io.on("connection", socketsController_1.socketsController);
