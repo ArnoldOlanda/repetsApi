@@ -1,4 +1,5 @@
-import express, { Application } from 'express'
+import express, { Application, Request, Response } from 'express'
+import path from 'path'
 import server from 'http'
 import io, { Socket } from 'socket.io'
 import morgan from 'morgan'
@@ -116,6 +117,18 @@ class Server {
         this.app.use(this.categoriaPath, routerCategorias)
         this.app.use(this.petsPath, routerPets)
         this.app.use(this.reservaPath, routerReservas)
+        this.app.get('/android/apk',(_req:Request, res:Response)=>{
+
+            try {
+                const file = path.join(__dirname,`../installers/repets-apk.apk`)
+                res.sendFile(file)
+            } catch (error) {
+                console.log(error);
+                res.status(404).json({
+                    err:"Archivo no encontrado"
+                })
+            }
+        })
     }
 
     sockets() {
