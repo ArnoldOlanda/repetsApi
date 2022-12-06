@@ -244,9 +244,9 @@ const socketsController = (socket = new socket_io_1.Socket()) => {
         socket.emit("obtener-chats", chats);
     }));
     socket.on("solicitar-mensajes", (payload) => __awaiter(void 0, void 0, void 0, function* () {
-        const { chat } = payload;
-        const chat2 = yield chat_1.default.findById(chat).populate('mensajes');
-        socket.emit('obtener-mensajes-chat', chat2 === null || chat2 === void 0 ? void 0 : chat2.mensajes);
+        const { owner, recipient } = payload;
+        const chat = yield chat_1.default.findOne({ usuario_owner: owner, usuario_recipient: recipient }).populate('mensajes');
+        socket.emit('obtener-mensajes', (chat === null || chat === void 0 ? void 0 : chat.mensajes) || []);
     }));
     socket.on("disconnect", () => {
         console.log("Conexion cerrada: ", socket.id);
