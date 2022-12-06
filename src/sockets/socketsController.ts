@@ -275,9 +275,19 @@ export const socketsController = (socket = new Socket()) => {
 
         const { owner, recipient } = payload
         
-        const chat = await Chat.findOne({ usuario_owner: owner, usuario_recipient: recipient }).populate('mensajes');
+        const chat = await Chat.findOne({ usuario_owner: owner, usuario_recipient: recipient })
+            .populate('usuario_owner', { nombre: 1, apellido: 1 })
+            .populate({
+                path: 'usuario_recipient',
+                select: { nombre: 1, apellido: 1, img: 1 },
+                populate: {
+                    path: 'pethouse',
+                    select: { nombre: 1, galeria: 1 }
+                }
+            })
+            .populate('mensajes');
 
-        socket.emit('obtener-mensajes', chat?.mensajes || []);
+        socket.emit('obtener-mensajes', chat || []);
     })
 
 
