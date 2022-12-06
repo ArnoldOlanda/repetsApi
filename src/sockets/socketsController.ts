@@ -273,11 +273,11 @@ export const socketsController = (socket = new Socket()) => {
     socket.on("solicitar-mensajes", async (payload: any) => {
 
 
-        const { chat } = payload
+        const { owner, recipient } = payload
+        
+        const chat = await Chat.findOne({ usuario_owner: owner, usuario_recipient: recipient }).populate('mensajes');
 
-        const chat2 = await Chat.findById(chat).populate('mensajes')
-
-        socket.emit('obtener-mensajes-chat', chat2?.mensajes)
+        socket.emit('obtener-mensajes', chat?.mensajes || []);
     })
 
 
