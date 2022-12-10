@@ -155,7 +155,7 @@ export const socketsController = (socket = new Socket()) => {
                         body: savedMensaje.mensaje,
                         title: nombre,
                     },
-                    data: { nombre: "Arnold Olanda", proyecto: "Repets App" },
+                    data: { type: "chat" },
                     apns: {
                         payload: { aps: { 'mutable-content': 1 } },
                         fcm_options: { image: 'image-url' },
@@ -168,7 +168,7 @@ export const socketsController = (socket = new Socket()) => {
                     //@ts-ignore
                     .send(message)
                     .then(_response => {
-                        console.log("Notificacion enviada");
+                        // console.log("Notificacion enviada");
                     })
                     .catch(console.log)
             }

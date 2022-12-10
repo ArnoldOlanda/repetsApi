@@ -149,7 +149,7 @@ const socketsController = (socket = new socket_io_1.Socket()) => {
                         body: savedMensaje.mensaje,
                         title: nombre,
                     },
-                    data: { nombre: "Arnold Olanda", proyecto: "Repets App" },
+                    data: { type: "chat" },
                     apns: {
                         payload: { aps: { 'mutable-content': 1 } },
                         fcm_options: { image: 'image-url' },
@@ -161,7 +161,7 @@ const socketsController = (socket = new socket_io_1.Socket()) => {
                     //@ts-ignore
                     .send(message)
                     .then(_response => {
-                    console.log("Notificacion enviada");
+                    // console.log("Notificacion enviada");
                 })
                     .catch(console.log);
             }
@@ -245,8 +245,18 @@ const socketsController = (socket = new socket_io_1.Socket()) => {
     }));
     socket.on("solicitar-mensajes", (payload) => __awaiter(void 0, void 0, void 0, function* () {
         const { owner, recipient } = payload;
-        const chat = yield chat_1.default.findOne({ usuario_owner: owner, usuario_recipient: recipient }).populate('mensajes');
-        socket.emit('obtener-mensajes', (chat === null || chat === void 0 ? void 0 : chat.mensajes) || []);
+        const chat = yield chat_1.default.findOne({ usuario_owner: owner, usuario_recipient: recipient })
+            .populate('usuario_owner', { nombre: 1, apellido: 1 })
+            .populate({
+            path: 'usuario_recipient',
+            select: { nombre: 1, apellido: 1, img: 1 },
+            populate: {
+                path: 'pethouse',
+                select: { nombre: 1, galeria: 1 }
+            }
+        })
+            .populate('mensajes');
+        socket.emit('obtener-mensajes', chat || []);
     }));
     socket.on("disconnect", () => {
         console.log("Conexion cerrada: ", socket.id);

@@ -4,6 +4,7 @@ import * as admin from 'firebase-admin';
 import Reserva from "../models/reserva";
 import Pethouse from "../models/petHouse";
 import Usuario from "../models/usuario";
+import { Message } from "firebase-admin/lib/messaging/messaging-api";
 
 
 export const listadoReservas = async (_req: Request, res: Response) => {
@@ -58,8 +59,8 @@ export const registrarReserva = async (req: Request, res: Response) => {
             const message = {
                     
                 notification: {
-                    body: "Tienes una nueva solicitud de reserva",
-                    title: "Nueva reserva",
+                    body: "Tienes una nueva solicitud de reserva, ingresa a la app para mas informacion",
+                    title: "Nueva solicitud de reserva",
                 },
                 data: { savedReserva: JSON.stringify(savedReserva), proyecto: "Repets App" },
                 apns: {

@@ -84,8 +84,8 @@ const registrarReserva = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (propietario) {
             const message = {
                 notification: {
-                    body: "Tienes una nueva solicitud de reserva",
-                    title: "Nueva reserva",
+                    body: "Tienes una nueva solicitud de reserva, ingresa a la app para mas informacion",
+                    title: "Nueva solicitud de reserva",
                 },
                 data: { savedReserva: JSON.stringify(savedReserva), proyecto: "Repets App" },
                 apns: {
