@@ -46,8 +46,9 @@ export const obtenerReserva = async (req: Request, res: Response) => {
 
 export const registrarReserva = async (req: Request, res: Response) => {
 
-    const { body } = req
-    const { pethouse } = body
+    const { body } = req;
+    const { pethouse } = body;
+    
     try {
         const usuarioPethouse = await Pethouse.findById(pethouse)
         const propietario = await Usuario.findById(usuarioPethouse?.propietario)
