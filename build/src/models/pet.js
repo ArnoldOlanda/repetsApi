@@ -32,6 +32,7 @@ const PetSchema = new mongoose_1.Schema({
     },
     edad: { type: Number },
     caracteristicas: [{ type: String, }],
+    descripcion: { type: String },
     img: { type: String, },
 });
 PetSchema.methods.toJSON = function () {

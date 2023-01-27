@@ -14,9 +14,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dbConnection = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
+const yargs_1 = __importDefault(require("yargs/yargs"));
+//Yargs config
+const argv = (0, yargs_1.default)(process.argv.slice(2)).options({
+    dev: { type: 'boolean' }
+}).parseSync();
 const dbConnection = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { dev } = argv;
+    const MONGO_URI = !!dev ? `${process.env.MONGODB_DEV}` : `${process.env.MONGODB_ATLAS}`;
+    // console.log(MONGO_URI)
     try {
-        yield mongoose_1.default.connect(`${process.env.MONGODB_ATLAS}`, {
+        yield mongoose_1.default.connect(MONGO_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             autoIndex: true

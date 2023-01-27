@@ -9,6 +9,8 @@ interface IReserva {
     pethouse: Schema.Types.ObjectId,
     mascota: Schema.Types.ObjectId,
     costo_total: number,
+    metodo_pago:string,
+    payment_intent_token:string,
     estado: string
 }
 
@@ -39,6 +41,12 @@ const ReservaSchema = new Schema<IReserva>({
     costo_total:{
         type:Number,
         required:true
+    },
+    metodo_pago:{
+        type: String,
+    },
+    payment_intent_token:{
+        type: String,
     },
     estado:{
         type:String,

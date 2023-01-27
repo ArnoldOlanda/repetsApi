@@ -39,6 +39,12 @@ const ReservaSchema = new mongoose_1.Schema({
         type: Number,
         required: true
     },
+    metodo_pago: {
+        type: String,
+    },
+    payment_intent_token: {
+        type: String,
+    },
     estado: {
         type: String,
         required: true,

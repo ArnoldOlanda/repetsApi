@@ -15,6 +15,7 @@ router.get('/:id', [
 ], petHouses_1.getPetHouseOne);
 router.post('/', [
     (0, express_validator_1.check)('nombre').not().isEmpty(),
+    // check('descripcion').not().isEmpty(),
     (0, express_validator_1.check)('distrito', 'El campo es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('provincia', 'El campo es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('propietario', 'El campo es obligatorio').isMongoId(),

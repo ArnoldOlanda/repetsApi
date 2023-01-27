@@ -1,11 +1,12 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Application } from 'express'
 import path from 'path'
 import server from 'http'
 import io, { Socket } from 'socket.io'
 import morgan from 'morgan'
 import cors from 'cors'
-import { v2 as cloudinary} from 'cloudinary'
+import { v2 as cloudinary } from 'cloudinary'
 import fileUpload from 'express-fileupload'
+import Stripe from 'stripe'
 
 import routerUsers from '../routes/users'
 import routerAuth from '../routes/auth'
@@ -13,6 +14,7 @@ import routerPetHouses from '../routes/petHouses'
 import routerCategorias from '../routes/categorias'
 import routerPets from '../routes/pets'
 import routerReservas from '../routes/reservas'
+import routerSubscriptions from '../routes/subscriptions'
 
 import { dbConnection } from '../database/config';
 import { socketsController } from '../sockets/socketsController'
@@ -44,18 +46,20 @@ class Server {
     port: string | number;
     userPaths: string;
     indexPath: string;
+    cloudinary: any;
+    stripe: any;
     authPath: string;
     petHousePath: string;
     categoriaPath: string;
     petsPath: string;
     reservaPath: string;
-    cloudinary: any;
+    subscriptionPath: string;
 
     constructor() {
         this.app = express();
         this.port = process.env.PORT || 5000;
         this.server = server.createServer(this.app);
-        this.io = new io.Server<ServerToClientEvents,ClientToServerEvents,InterServerEvents,SocketData>(this.server)
+        this.io = new io.Server<ServerToClientEvents, ClientToServerEvents, InterServerEvents, SocketData>(this.server)
 
         this.indexPath = '/api';
         this.userPaths = '/api/usuarios';
@@ -64,12 +68,18 @@ class Server {
         this.categoriaPath = '/api/categorias';
         this.petsPath = '/api/pets';
         this.reservaPath = '/api/reserva';
-        
+        this.subscriptionPath = '/api/subscription';
+
         //Cloudinary config
         this.cloudinary = cloudinary.config({
-            cloud_name:`${process.env.CLOUDINARY_NAME}`,
+            cloud_name: `${process.env.CLOUDINARY_NAME}`,
             api_key: `${process.env.CLOUDINARY_API_KEY}`,
-            api_secret:process.env.CLOUDINARY_API_SECRET,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+
+        //Stripe config
+        this.stripe = new Stripe('sk_test_51MR2e5DGlfAnj7PF1H5xf59VWQJXJT9JPyl7r3ISyYm6XqVzkAyu1HybfCgiH8aP4kAFnCqAKk0dvngAbUko2a4900A5GcmtEA', {
+            apiVersion: '2022-11-15',
         });
 
         //Conectar a base de datos
@@ -101,8 +111,8 @@ class Server {
 
         //Carga de archivos - imagenes
         this.app.use(fileUpload({
-            useTempFiles : true,
-            tempFileDir : '/tmp/'
+            useTempFiles: true,
+            tempFileDir: '/tmp/'
         }));
 
     }
@@ -110,17 +120,44 @@ class Server {
     routes() {
         this.app.get(this.indexPath, (_, res) => {  // '_' para ignorar los parametros no usados
             res.json({ msg: "re-pets api - conected" })
-        })
+        });
+
+        this.app.post(`${this.indexPath}/payment-intent`, async (req, res) => {
+            try {
+                console.log(req.body);
+                const { amount, currency } = req.body;
+
+                const paymentIntent = await this.stripe.paymentIntents.create({
+                    amount,
+                    currency,
+                });
+
+
+                res.json({
+                    ok: true,
+                    clientSecret: paymentIntent.client_secret
+                })
+            } catch (error) {
+                console.log(error)
+                res.json({
+                    ok: 'false',
+                    msg: error
+                })
+            }
+        });
+
         this.app.use(this.userPaths, routerUsers)
         this.app.use(this.authPath, routerAuth)
         this.app.use(this.petHousePath, routerPetHouses)
         this.app.use(this.categoriaPath, routerCategorias)
         this.app.use(this.petsPath, routerPets)
         this.app.use(this.reservaPath, routerReservas)
+        this.app.use(this.subscriptionPath, routerSubscriptions)
+
     }
 
     sockets() {
-        this.io.on("connection",socketsController)
+        this.io.on("connection", socketsController)
     }
 
     listen() {

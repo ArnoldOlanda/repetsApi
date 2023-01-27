@@ -8,6 +8,7 @@ interface Coordendas{
 
 interface IPetHouse {
     nombre: string;
+    descripcion:string;
     distrito: string;
     provincia: string;
     direccion: string;
@@ -19,14 +20,15 @@ interface IPetHouse {
     tarifa_hora: number;
     calificacion: number; // 1 al 5
     tipo_mascotas: string;
-    tamanio_mascotas: string;
-    tipo_alojamiento: string;
+    tamanio_mascotas: string[];
+    tipo_alojamiento: string[];
     estado: boolean;
 }
 
 
 const PetHouseSchema = new Schema<IPetHouse>({
     nombre: { type: String, },
+    descripcion:{ type: String },
     distrito: {
         type: String,
         required: [true, "El distrito es obligatorio"],
@@ -63,11 +65,14 @@ const PetHouseSchema = new Schema<IPetHouse>({
         type: String,
         required: true
     },
-    tamanio_mascotas:{
+    tamanio_mascotas:[{
         type: String,
         required: true
-    },
-    tipo_alojamiento: { type: String, required: true },
+    }],
+    tipo_alojamiento: [{ 
+        type: String, 
+        required: true 
+    }],
     estado:{
         type: Boolean,
         default: true,

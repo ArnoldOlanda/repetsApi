@@ -5,6 +5,10 @@ import { v2 as cloudinary } from 'cloudinary'
 
 import PetHouse from "../models/petHouse";
 import Usuario from "../models/usuario";
+import Subscription from '../models/subscription'
+import moment from "moment";
+
+import { remainingSubscriptionDays } from '../helpers/calculateRemainingSubscriptionDays'
 
 // Lista de pethouses
 export const getPetHouse = async (_req: Request, res: Response) => {
@@ -47,12 +51,10 @@ export const getPetHouseOne = async (req: Request, res: Response) => {
 export const postPetHouse = async (req: Request, res: Response) => {
 
     try {
-        const { ...data } = req.body;
+        const { subscriptionData, ...data } = req.body;
 
         const pethouse = new PetHouse(data);
-
         const savedPethouse = await pethouse.save();
-
         const user = await Usuario.findById( savedPethouse.propietario );
 
         if(user){
@@ -60,9 +62,27 @@ export const postPetHouse = async (req: Request, res: Response) => {
             await user.save()
         }
 
+        
+        const renovation_date = moment(new Date(subscriptionData.subscription_date)).add(1,'M').toDate();
+        const subscriptionDateToSave = {
+            ...subscriptionData,
+            renew_subscription_date: subscriptionData.subscription_date,
+            subscription_end_date:renovation_date,
+        }
+
+        const subscription = new Subscription(subscriptionDateToSave);
+        const savedSubscription = await subscription.save();
+
+        // const now: Moment = moment(new Date(savedSubscription.subscription_date));
+        // const subscriptionEndDate: Moment = moment(new Date(savedSubscription.subscription_end_date));
+        const remainingDays: number = remainingSubscriptionDays(savedSubscription.subscription_date,savedSubscription.subscription_end_date)
+
         return res.json({
+
             msg: "PetHouse registrada",
             pethouse,
+            savedSubscription,
+            remainingDays
         })
 
     } catch (error) {

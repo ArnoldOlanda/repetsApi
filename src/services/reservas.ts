@@ -56,14 +56,30 @@ export const registrarReserva = async (req: Request, res: Response) => {
         const newReserva = new Reserva(body)
         const savedReserva = await newReserva.save()
         
+        // const { payment_intent_token, ...savedReservaWithOuthPaymentToken} = savedReserva.toJSON();
+
+        const reservaData={
+            fecha_reserva: savedReserva.fecha_reserva.toLocaleDateString(),
+            fecha_solicitud: savedReserva.fecha_solicitud.toLocaleDateString(),
+            duracion_dias: String(savedReserva.duracion_dias),            
+            duracion_horas: String(savedReserva.duracion_horas),            
+            usuario: String(savedReserva.usuario),
+            pethouse: String(savedReserva.pethouse),
+            mascota: String(savedReserva.mascota),
+            costo_total: String(savedReserva.costo_total),
+            metodo_pago: String(savedReserva.metodo_pago),
+            estado: String(savedReserva.estado),            
+            tipo:'notificacion_reserva'
+        }
+
         if(propietario){
             const message = {
                     
                 notification: {
-                    body: "Tienes una nueva solicitud de reserva, ingresa a la app para mas informacion",
+                    body: "Tienes una nueva solicitud de reserva, revisa los mensajes",
                     title: "Nueva solicitud de reserva",
                 },
-                data: { savedReserva: JSON.stringify(savedReserva), proyecto: "Repets App" },
+                data: reservaData,
                 apns: {
                     payload: { aps: { 'mutable-content': 1 } },
                     fcm_options: { image: 'image-url' },

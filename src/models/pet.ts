@@ -32,6 +32,7 @@ const PetSchema = new Schema<IPet>({
     },
     edad:{ type: Number },
     caracteristicas: [{ type: String, }],
+    descripcion:{ type: String },
     img:{ type: String, },
 
 });

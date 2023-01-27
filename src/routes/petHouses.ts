@@ -25,6 +25,7 @@ router.get('/:id',[
 
 router.post   ('/',[
     check('nombre').not().isEmpty(),
+    // check('descripcion').not().isEmpty(),
     check('distrito','El campo es obligatorio').not().isEmpty(),
     check('provincia','El campo es obligatorio').not().isEmpty(),
     check('propietario','El campo es obligatorio').isMongoId(),

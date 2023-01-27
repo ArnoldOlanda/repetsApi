@@ -19,12 +19,14 @@ const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
 const cloudinary_1 = require("cloudinary");
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
+const stripe_1 = __importDefault(require("stripe"));
 const users_1 = __importDefault(require("../routes/users"));
 const auth_1 = __importDefault(require("../routes/auth"));
 const petHouses_1 = __importDefault(require("../routes/petHouses"));
 const categorias_1 = __importDefault(require("../routes/categorias"));
 const pets_1 = __importDefault(require("../routes/pets"));
 const reservas_1 = __importDefault(require("../routes/reservas"));
+const subscriptions_1 = __importDefault(require("../routes/subscriptions"));
 const config_1 = require("../database/config");
 const socketsController_1 = require("../sockets/socketsController");
 class Server {
@@ -40,11 +42,16 @@ class Server {
         this.categoriaPath = '/api/categorias';
         this.petsPath = '/api/pets';
         this.reservaPath = '/api/reserva';
+        this.subscriptionPath = '/api/subscription';
         //Cloudinary config
         this.cloudinary = cloudinary_1.v2.config({
             cloud_name: `${process.env.CLOUDINARY_NAME}`,
             api_key: `${process.env.CLOUDINARY_API_KEY}`,
             api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+        //Stripe config
+        this.stripe = new stripe_1.default('sk_test_51MR2e5DGlfAnj7PF1H5xf59VWQJXJT9JPyl7r3ISyYm6XqVzkAyu1HybfCgiH8aP4kAFnCqAKk0dvngAbUko2a4900A5GcmtEA', {
+            apiVersion: '2022-11-15',
         });
         //Conectar a base de datos
         this.conectarDB();
@@ -77,12 +84,34 @@ class Server {
         this.app.get(this.indexPath, (_, res) => {
             res.json({ msg: "re-pets api - conected" });
         });
+        this.app.post(`${this.indexPath}/payment-intent`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log(req.body);
+                const { amount, currency } = req.body;
+                const paymentIntent = yield this.stripe.paymentIntents.create({
+                    amount,
+                    currency,
+                });
+                res.json({
+                    ok: true,
+                    clientSecret: paymentIntent.client_secret
+                });
+            }
+            catch (error) {
+                console.log(error);
+                res.json({
+                    ok: 'false',
+                    msg: error
+                });
+            }
+        }));
         this.app.use(this.userPaths, users_1.default);
         this.app.use(this.authPath, auth_1.default);
         this.app.use(this.petHousePath, petHouses_1.default);
         this.app.use(this.categoriaPath, categorias_1.default);
         this.app.use(this.petsPath, pets_1.default);
         this.app.use(this.reservaPath, reservas_1.default);
+        this.app.use(this.subscriptionPath, subscriptions_1.default);
     }
     sockets() {
         this.io.on("connection", socketsController_1.socketsController);

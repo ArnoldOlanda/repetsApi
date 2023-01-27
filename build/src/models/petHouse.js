@@ -14,6 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const PetHouseSchema = new mongoose_1.Schema({
     nombre: { type: String, },
+    descripcion: { type: String },
     distrito: {
         type: String,
         required: [true, "El distrito es obligatorio"],
@@ -50,11 +51,14 @@ const PetHouseSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    tamanio_mascotas: {
-        type: String,
-        required: true
-    },
-    tipo_alojamiento: { type: String, required: true },
+    tamanio_mascotas: [{
+            type: String,
+            required: true
+        }],
+    tipo_alojamiento: [{
+            type: String,
+            required: true
+        }],
     estado: {
         type: Boolean,
         default: true,

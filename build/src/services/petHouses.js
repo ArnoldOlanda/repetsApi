@@ -27,6 +27,9 @@ exports.deletePetHouse = exports.putPetHouse = exports.updateGalleryPetHouse = e
 const cloudinary_1 = require("cloudinary");
 const petHouse_1 = __importDefault(require("../models/petHouse"));
 const usuario_1 = __importDefault(require("../models/usuario"));
+const subscription_1 = __importDefault(require("../models/subscription"));
+const moment_1 = __importDefault(require("moment"));
+const calculateRemainingSubscriptionDays_1 = require("../helpers/calculateRemainingSubscriptionDays");
 // Lista de pethouses
 const getPetHouse = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -63,7 +66,7 @@ exports.getPetHouseOne = getPetHouseOne;
 // Registrar nueva pethouse
 const postPetHouse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = __rest(req.body, []);
+        const _a = req.body, { subscriptionData } = _a, data = __rest(_a, ["subscriptionData"]);
         const pethouse = new petHouse_1.default(data);
         const savedPethouse = yield pethouse.save();
         const user = yield usuario_1.default.findById(savedPethouse.propietario);
@@ -71,9 +74,18 @@ const postPetHouse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             user.pethouse = savedPethouse.id;
             yield user.save();
         }
+        const renovation_date = (0, moment_1.default)(new Date(subscriptionData.subscription_date)).add(1, 'M').toDate();
+        const subscriptionDateToSave = Object.assign(Object.assign({}, subscriptionData), { renew_subscription_date: subscriptionData.subscription_date, subscription_end_date: renovation_date });
+        const subscription = new subscription_1.default(subscriptionDateToSave);
+        const savedSubscription = yield subscription.save();
+        // const now: Moment = moment(new Date(savedSubscription.subscription_date));
+        // const subscriptionEndDate: Moment = moment(new Date(savedSubscription.subscription_end_date));
+        const remainingDays = (0, calculateRemainingSubscriptionDays_1.remainingSubscriptionDays)(savedSubscription.subscription_date, savedSubscription.subscription_end_date);
         return res.json({
             msg: "PetHouse registrada",
             pethouse,
+            savedSubscription,
+            remainingDays
         });
     }
     catch (error) {
