@@ -21,9 +21,13 @@ const MensajeSchema = new mongoose_1.Schema({
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Usuario'
     },
-    destinatario: {
+    chat_id: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Usuario'
+        ref: 'Chat',
+        required: true
+    },
+    tipo: {
+        type: String
     },
     mensaje: String
 });

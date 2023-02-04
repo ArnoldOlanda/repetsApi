@@ -7,9 +7,10 @@ interface IReserva {
     duracion_horas: number,
     usuario: Schema.Types.ObjectId,
     pethouse: Schema.Types.ObjectId,
-    mascota: Schema.Types.ObjectId,
+    mascotas: Schema.Types.ObjectId[],
     costo_total: number,
     metodo_pago:string,
+    tipo_reserva:string,
     payment_intent_token:string,
     estado: string
 }
@@ -34,16 +35,19 @@ const ReservaSchema = new Schema<IReserva>({
         type:Schema.Types.ObjectId,
         ref:'PetHouse'
     },
-    mascota:{
+    mascotas:[{
         type:Schema.Types.ObjectId,
         ref:'Pet'
-    },
+    }],
     costo_total:{
         type:Number,
         required:true
     },
     metodo_pago:{
         type: String,
+    },
+    tipo_reserva:{
+        type: String
     },
     payment_intent_token:{
         type: String,

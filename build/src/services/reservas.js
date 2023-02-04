@@ -89,7 +89,7 @@ const registrarReserva = (req, res) => __awaiter(void 0, void 0, void 0, functio
             duracion_horas: String(savedReserva.duracion_horas),
             usuario: String(savedReserva.usuario),
             pethouse: String(savedReserva.pethouse),
-            mascota: String(savedReserva.mascota),
+            mascota: String(savedReserva.mascotas.join("")),
             costo_total: String(savedReserva.costo_total),
             metodo_pago: String(savedReserva.metodo_pago),
             estado: String(savedReserva.estado),

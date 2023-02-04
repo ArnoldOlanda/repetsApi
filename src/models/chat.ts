@@ -1,26 +1,21 @@
 import { Schema, model } from 'mongoose';
 
-interface IChat {
-    usuario_owner: Schema.Types.ObjectId;
-    usuario_recipient: Schema.Types.ObjectId;
-    mensajes: Schema.Types.ObjectId[];
+export interface IChat {
+    miembros: Schema.Types.ObjectId[];
+    new_messages: boolean;
     ultimo_mensaje: Schema.Types.ObjectId;
 }
 
 
 const ChatSchema = new Schema<IChat>({
-    usuario_owner: {
+    miembros:[{
         type: Schema.Types.ObjectId,
         ref:'Usuario'
-    },
-    usuario_recipient:{
-        type: Schema.Types.ObjectId,
-        ref:'Usuario'
-    },
-    mensajes:[{
-        type: Schema.Types.ObjectId,
-        ref:'Mensaje'
     }],
+    new_messages:{
+        type:Boolean,
+        default:true
+    },
     ultimo_mensaje:{
         type: Schema.Types.ObjectId,
         ref:'Mensaje'

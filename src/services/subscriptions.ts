@@ -37,7 +37,7 @@ export const renewSubscription = async (req: Request, res: Response) => {
     const { newRenewSubscriptionDate } = req.body
     const { id } = req.params
     try {
-        const newSubscriptionEndDate = moment(new Date(newRenewSubscriptionDate)).add(1, 'M').toDate();
+        const newSubscriptionEndDate: Date = moment(new Date(newRenewSubscriptionDate)).add(1, 'M').toDate();
         const data = {
             renew_subscription_date: newRenewSubscriptionDate,
             subscription_end_date: newSubscriptionEndDate

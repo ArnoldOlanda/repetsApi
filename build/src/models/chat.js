@@ -13,18 +13,14 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const ChatSchema = new mongoose_1.Schema({
-    usuario_owner: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Usuario'
-    },
-    usuario_recipient: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Usuario'
-    },
-    mensajes: [{
+    miembros: [{
             type: mongoose_1.Schema.Types.ObjectId,
-            ref: 'Mensaje'
+            ref: 'Usuario'
         }],
+    new_messages: {
+        type: Boolean,
+        default: true
+    },
     ultimo_mensaje: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Mensaje'

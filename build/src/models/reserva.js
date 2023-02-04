@@ -31,16 +31,19 @@ const ReservaSchema = new mongoose_1.Schema({
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'PetHouse'
     },
-    mascota: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Pet'
-    },
+    mascotas: [{
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: 'Pet'
+        }],
     costo_total: {
         type: Number,
         required: true
     },
     metodo_pago: {
         type: String,
+    },
+    tipo_reserva: {
+        type: String
     },
     payment_intent_token: {
         type: String,

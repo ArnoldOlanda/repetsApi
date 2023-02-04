@@ -1,9 +1,10 @@
 import { Schema, model } from 'mongoose';
 
-interface IMensaje {
+export interface IMensaje {
     fecha: Date;
     emisor: Schema.Types.ObjectId;
-    destinatario: Schema.Types.ObjectId;
+    chat_id: Schema.Types.ObjectId;
+    tipo: string;
     mensaje: string;
 }
 
@@ -17,9 +18,13 @@ const MensajeSchema = new Schema<IMensaje>({
         type: Schema.Types.ObjectId,
         ref:'Usuario'
     },
-    destinatario:{
+    chat_id:{
         type: Schema.Types.ObjectId,
-        ref:'Usuario'
+        ref:'Chat',
+        required: true
+    },
+    tipo:{
+        type: String
     },
     mensaje: String
 });

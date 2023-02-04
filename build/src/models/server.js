@@ -27,6 +27,7 @@ const categorias_1 = __importDefault(require("../routes/categorias"));
 const pets_1 = __importDefault(require("../routes/pets"));
 const reservas_1 = __importDefault(require("../routes/reservas"));
 const subscriptions_1 = __importDefault(require("../routes/subscriptions"));
+const mensajes_1 = __importDefault(require("../routes/mensajes"));
 const config_1 = require("../database/config");
 const socketsController_1 = require("../sockets/socketsController");
 class Server {
@@ -43,6 +44,7 @@ class Server {
         this.petsPath = '/api/pets';
         this.reservaPath = '/api/reserva';
         this.subscriptionPath = '/api/subscription';
+        this.mensajesPath = '/api/mensajes';
         //Cloudinary config
         this.cloudinary = cloudinary_1.v2.config({
             cloud_name: `${process.env.CLOUDINARY_NAME}`,
@@ -112,6 +114,7 @@ class Server {
         this.app.use(this.petsPath, pets_1.default);
         this.app.use(this.reservaPath, reservas_1.default);
         this.app.use(this.subscriptionPath, subscriptions_1.default);
+        this.app.use(this.mensajesPath, mensajes_1.default);
     }
     sockets() {
         this.io.on("connection", socketsController_1.socketsController);

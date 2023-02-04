@@ -36,111 +36,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.socketsController = void 0;
-const socket_io_1 = require("socket.io");
 const admin = __importStar(require("firebase-admin"));
-const chat_1 = __importDefault(require("../models/chat"));
-const mensaje_1 = __importDefault(require("../models/mensaje"));
 const usuario_1 = __importDefault(require("../models/usuario"));
+const reserva_1 = __importDefault(require("../models/reserva"));
+const petHouse_1 = __importDefault(require("../models/petHouse"));
+const findOrCreateChat_1 = require("../helpers/findOrCreateChat");
 //@ts-ignore
-const socketsController = (socket = new socket_io_1.Socket()) => {
+const socketsController = (socket) => {
     console.log(`Nueva conexion de: ${socket.id}`);
     const uid = socket.handshake.headers['usuario-uid'];
     socket.join(uid);
     socket.on("enviar-mensaje", (payload) => __awaiter(void 0, void 0, void 0, function* () {
-        const { owner, recipient, mensaje } = payload;
+        const { owner, recipient } = payload;
         try {
-            //Busqueda de existencia de chats
-            const chatOwner = yield chat_1.default.findOne({ usuario_owner: owner, usuario_recipient: recipient }).exec();
-            const chatRecipient = yield chat_1.default.findOne({ usuario_owner: recipient, usuario_recipient: owner }).exec();
-            //Guardado del mensaje
-            const newMensaje = new mensaje_1.default({
-                fecha: new Date(),
-                emisor: owner,
-                destinatario: recipient,
-                mensaje
-            });
-            const savedMensaje = yield newMensaje.save();
-            if (!chatOwner) { //Creacion del chat
-                const newChatOwner = new chat_1.default({ usuario_owner: owner, usuario_recipient: recipient });
-                newChatOwner.mensajes = newChatOwner.mensajes.concat(savedMensaje.id);
-                newChatOwner.ultimo_mensaje = savedMensaje.id;
-                yield newChatOwner.save();
-                const chats = yield chat_1.default.find({ usuario_owner: uid })
-                    .populate('usuario_owner', { nombre: 1, apellido: 1 })
-                    .populate({
-                    path: 'usuario_recipient',
-                    select: { nombre: 1, apellido: 1, img: 1 },
-                    populate: {
-                        path: 'pethouse',
-                        select: { nombre: 1, galeria: 1 }
-                    }
-                })
-                    .populate('ultimo_mensaje')
-                    .populate('mensajes');
-                socket.emit("chat-privado", { mensaje: savedMensaje });
-                socket.emit("obtener-chats", chats);
-            }
-            else {
-                chatOwner.mensajes = chatOwner.mensajes.concat(savedMensaje.id);
-                chatOwner.ultimo_mensaje = savedMensaje.id;
-                yield chatOwner.save();
-                const chats = yield chat_1.default.find({ usuario_owner: uid })
-                    .populate('usuario_owner', { nombre: 1, apellido: 1 })
-                    .populate({
-                    path: 'usuario_recipient',
-                    select: { nombre: 1, apellido: 1, img: 1 },
-                    populate: {
-                        path: 'pethouse',
-                        select: { nombre: 1, galeria: 1 }
-                    }
-                })
-                    .populate('ultimo_mensaje')
-                    .populate('mensajes');
-                socket.emit("chat-privado", { mensaje: savedMensaje });
-                socket.emit("obtener-chats", chats);
-            }
-            if (!chatRecipient) { //Creacion del chat
-                const newChatRecipient = new chat_1.default({ usuario_owner: recipient, usuario_recipient: owner });
-                newChatRecipient.mensajes = newChatRecipient.mensajes.concat(savedMensaje.id);
-                newChatRecipient.ultimo_mensaje = savedMensaje.id;
-                yield newChatRecipient.save();
-                const chats = yield chat_1.default.find({ usuario_owner: recipient })
-                    .populate('usuario_owner', { nombre: 1, apellido: 1 })
-                    .populate({
-                    path: 'usuario_recipient',
-                    select: { nombre: 1, apellido: 1, img: 1 },
-                    populate: {
-                        path: 'pethouse',
-                        select: { nombre: 1, galeria: 1 }
-                    }
-                })
-                    .populate('ultimo_mensaje')
-                    .populate('mensajes');
-                socket.to(recipient).emit("chat-privado", { mensaje: savedMensaje });
-                socket.to(recipient).emit("obtener-chats", chats);
-            }
-            else {
-                chatRecipient.mensajes = chatRecipient.mensajes.concat(savedMensaje.id);
-                chatRecipient.ultimo_mensaje = savedMensaje.id;
-                yield chatRecipient.save();
-                const chats = yield chat_1.default.find({ usuario_owner: recipient })
-                    .populate('usuario_owner', { nombre: 1, apellido: 1, img: 1 })
-                    .populate({
-                    path: 'usuario_recipient',
-                    select: { nombre: 1, apellido: 1 },
-                    populate: {
-                        path: 'pethouse',
-                        select: { nombre: 1, galeria: 1 }
-                    }
-                })
-                    .populate('ultimo_mensaje')
-                    .populate('mensajes');
-                socket.to(recipient).emit("chat-privado", { mensaje: savedMensaje });
-                socket.to(recipient).emit("obtener-chats", chats);
-                //TODO: ver porque no se actualizan los chats del usuario al recibir nuevo mensaje
-            }
+            const { savedMensaje, chats, chatsRecipient } = yield (0, findOrCreateChat_1.findOrCreateChat)(Object.assign({}, payload));
             const user = yield usuario_1.default.findById(recipient);
             const emisor = yield usuario_1.default.findById(owner).populate('pethouse', { nombre: 1 });
+            //if (chats) {
+            socket.emit("obtener-chats", chats);
+            socket.to(`${recipient}`).emit("obtener-chats", chatsRecipient);
+            //}//Renovar evento: actualizar chats
+            socket.emit("chat-privado", { mensaje: savedMensaje });
+            socket.to(`${recipient}`).emit("chat-privado", { mensaje: savedMensaje });
             if (user && emisor) {
                 //@ts-ignore
                 const nombre = (emisor === null || emisor === void 0 ? void 0 : emisor.pethouse) ? emisor === null || emisor === void 0 ? void 0 : emisor.pethouse.nombre : emisor.nombre;
@@ -170,93 +87,132 @@ const socketsController = (socket = new socket_io_1.Socket()) => {
             console.log(error);
         }
     }));
-    socket.on('enviar-mensaje-global', (payload) => __awaiter(void 0, void 0, void 0, function* () {
-        const { emisor, destinatario, mensaje } = payload;
+    // socket.on('enviar-mensaje-global', async (payload: IPayloadSendMessage) => {
+    //     const { emisor, destinatario, mensaje } = payload
+    //     try {
+    //         const newMensaje = new Mensaje({
+    //             fecha: new Date(),
+    //             emisor,
+    //             destinatario,
+    //             mensaje
+    //         })
+    //         const user = await Usuario.findById(destinatario)
+    //         const savedMensaje = await newMensaje.save();
+    //         const chatEmisor = await Chat.findById(emisor);
+    //         const chatDestinatario = await Chat.findById(destinatario);
+    //         if (chatEmisor)
+    //             chatEmisor.mensajes = chatEmisor.mensajes.concat(savedMensaje.id)
+    //         if (chatDestinatario)
+    //             chatDestinatario.mensajes = chatDestinatario.mensajes.concat(savedMensaje.id)
+    //         if (user) {
+    //             const message = {
+    //                 //tokens: [''],
+    //                 notification: {
+    //                     body: user.nombre + ' : ' + savedMensaje.mensaje,
+    //                     title: 'Repets App',
+    //                 },
+    //                 data: {
+    //                     nombre: "Arnold Olanda",
+    //                     proyecto: "Repets App"
+    //                 },
+    //                 apns: {
+    //                     payload: {
+    //                         aps: { 'mutable-content': 1 },
+    //                     },
+    //                     fcm_options: { image: 'image-url' },
+    //                 },
+    //                 android: {
+    //                     notification: { image: 'image-url' },
+    //                 },
+    //                 token: user.notification_token
+    //             };
+    //             await admin.messaging()
+    //                 //@ts-ignore
+    //                 .send(message)
+    //                 .then(response => {
+    //                     console.log(response);
+    //                     console.log("Notificacion enviada");
+    //                 })
+    //                 .catch(console.log)
+    //         }
+    //         const mensajes = await Mensaje.find()
+    //             .populate('emisor', { nombre: 1, apellido: 1 })
+    //             .populate('destinatario', { nombre: 1, apellido: 1 })
+    //         socket.broadcast.emit('actualizar-mensajes', mensajes)
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // })
+    // socket.on('solicitar-chats', async (payload: IPayloadGetChats) => {
+    //     const { uid } = payload;
+    //     const chats = await Chat.find({ miembros: { $in: [uid] } })
+    //     socket.emit("obtener-chats", chats)
+    // })
+    // socket.on("solicitar-mensajes", async (payload: any) => {
+    //     const { owner, recipient } = payload
+    //     const chat = await Chat.findOne({ miembros: { $and: [{ $in: owner }, { $in: recipient }] } });
+    //     socket.emit('obtener-mensajes', chat || []);
+    // })
+    socket.on("save-new-reservation", (payload) => __awaiter(void 0, void 0, void 0, function* () {
+        const { usuario, pethouse } = payload;
         try {
-            const newMensaje = new mensaje_1.default({
-                fecha: new Date(),
-                emisor,
-                destinatario,
-                mensaje
+            const usuarioPethouse = yield petHouse_1.default.findById(pethouse);
+            const propietario = yield usuario_1.default.findById(usuarioPethouse === null || usuarioPethouse === void 0 ? void 0 : usuarioPethouse.propietario);
+            const newReserva = new reserva_1.default(payload);
+            const savedReserva = yield newReserva.save();
+            const reservaData = {
+                fecha_reserva: savedReserva.fecha_reserva.toLocaleDateString(),
+                fecha_solicitud: savedReserva.fecha_solicitud.toLocaleDateString(),
+                duracion_dias: String(savedReserva.duracion_dias),
+                duracion_horas: String(savedReserva.duracion_horas),
+                usuario: String(savedReserva.usuario),
+                pethouse: String(savedReserva.pethouse),
+                mascotas: String(savedReserva.mascotas),
+                costo_total: String(savedReserva.costo_total),
+                metodo_pago: String(savedReserva.metodo_pago),
+                estado: String(savedReserva.estado),
+                tipo: 'notificacion_reserva',
+                tipo_reserva: savedReserva.tipo_reserva
+            };
+            const { savedMensaje, chats } = yield (0, findOrCreateChat_1.findOrCreateChat)({
+                owner: usuario,
+                recipient: propietario.id,
+                mensaje: "Tienes una nueva reserva! :)",
+                tipo: "notificacion",
             });
-            const user = yield usuario_1.default.findById(destinatario);
-            const savedMensaje = yield newMensaje.save();
-            const chatEmisor = yield chat_1.default.findById(emisor);
-            const chatDestinatario = yield chat_1.default.findById(destinatario);
-            if (chatEmisor)
-                chatEmisor.mensajes = chatEmisor.mensajes.concat(savedMensaje.id);
-            if (chatDestinatario)
-                chatDestinatario.mensajes = chatDestinatario.mensajes.concat(savedMensaje.id);
-            if (user) {
+            //Envio de la notificacion
+            if (propietario) {
                 const message = {
-                    //tokens: [''],
                     notification: {
-                        body: user.nombre + ' : ' + savedMensaje.mensaje,
-                        title: 'Repets App',
+                        body: "Tienes una nueva solicitud de reserva, revisa los mensajes",
+                        title: "Nueva solicitud de reserva",
                     },
-                    data: {
-                        nombre: "Arnold Olanda",
-                        proyecto: "Repets App"
-                    },
+                    data: reservaData,
                     apns: {
-                        payload: {
-                            aps: { 'mutable-content': 1 },
-                        },
+                        payload: { aps: { 'mutable-content': 1 } },
                         fcm_options: { image: 'image-url' },
                     },
-                    android: {
-                        notification: { image: 'image-url' },
-                    },
-                    token: user.notification_token
+                    android: { notification: { image: 'image-url' } },
+                    token: propietario.notification_token
                 };
                 yield admin.messaging()
                     //@ts-ignore
                     .send(message)
-                    .then(response => {
-                    console.log(response);
+                    .then(_response => {
                     console.log("Notificacion enviada");
                 })
                     .catch(console.log);
             }
-            const mensajes = yield mensaje_1.default.find()
-                .populate('emisor', { nombre: 1, apellido: 1 })
-                .populate('destinatario', { nombre: 1, apellido: 1 });
-            socket.broadcast.emit('actualizar-mensajes', mensajes);
+            if (chats) {
+                socket.emit("obtener-chats", chats);
+                socket.to(`${propietario.id}`).emit("obtener-chats", chats);
+            }
+            socket.emit("chat-privado", { mensaje: savedMensaje });
+            socket.to(`${propietario.id}`).emit("new-reservation", Object.assign(Object.assign({}, savedMensaje.toJSON()), { reserva: savedReserva.id }));
         }
         catch (error) {
             console.log(error);
         }
-    }));
-    socket.on('solicitar-chats', (payload) => __awaiter(void 0, void 0, void 0, function* () {
-        const { uid } = payload;
-        const chats = yield chat_1.default.find({ usuario_owner: uid })
-            .populate('usuario_owner', { nombre: 1, apellido: 1 })
-            .populate({
-            path: 'usuario_recipient',
-            select: { nombre: 1, apellido: 1, img: 1 },
-            populate: {
-                path: 'pethouse',
-                select: { nombre: 1, galeria: 1 }
-            }
-        })
-            .populate('ultimo_mensaje')
-            .populate('mensajes');
-        socket.emit("obtener-chats", chats);
-    }));
-    socket.on("solicitar-mensajes", (payload) => __awaiter(void 0, void 0, void 0, function* () {
-        const { owner, recipient } = payload;
-        const chat = yield chat_1.default.findOne({ usuario_owner: owner, usuario_recipient: recipient })
-            .populate('usuario_owner', { nombre: 1, apellido: 1 })
-            .populate({
-            path: 'usuario_recipient',
-            select: { nombre: 1, apellido: 1, img: 1 },
-            populate: {
-                path: 'pethouse',
-                select: { nombre: 1, galeria: 1 }
-            }
-        })
-            .populate('mensajes');
-        socket.emit('obtener-mensajes', chat || []);
     }));
     socket.on("disconnect", () => {
         console.log("Conexion cerrada: ", socket.id);
