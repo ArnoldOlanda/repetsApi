@@ -7,6 +7,7 @@ interface Params {
     recipient: Schema.Types.ObjectId;
     mensaje: string;
     tipo: string;
+    reserva_id?: string | null; 
 }
 
 interface Data {
@@ -15,7 +16,7 @@ interface Data {
     chatsRecipient: (Document<unknown, any, IChat> & IChat & {_id: Types.ObjectId;})[] | [];
 }
 
-export const findOrCreateChat = async ({ owner, recipient, mensaje, tipo }: Params) => {
+export const findOrCreateChat = async ({ owner, recipient, mensaje, tipo, reserva_id = null }: Params) => {
     //Busqueda de existencia de chats
     const chat = await Chat.findOne({
         $and: [
@@ -41,7 +42,8 @@ export const findOrCreateChat = async ({ owner, recipient, mensaje, tipo }: Para
             emisor: owner,
             chat_id: newChat.id,
             tipo,
-            mensaje
+            mensaje,
+            reserva_id
         })
         const savedMensaje = await newMensaje.save();
         data.savedMensaje = savedMensaje;
@@ -56,7 +58,8 @@ export const findOrCreateChat = async ({ owner, recipient, mensaje, tipo }: Para
             emisor: owner,
             chat_id: chat.id,
             tipo,
-            mensaje
+            mensaje,
+            reserva_id
         })
 
         const savedMensaje = await newMensaje.save();
