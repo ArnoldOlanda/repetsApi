@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev src/index.ts --dev",
-    "start": "node build/src/index.js",
+    "dev": "cross-env NODE_ENV=development ts-node-dev src/index.ts",
+    "start": "cross-env NODE_ENV=production node build/src/index.js",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +22,7 @@
     "@types/nodemailer": "^6.4.5",
     "@types/uuid": "^8.3.4",
     "@types/yargs": "^17.0.20",
+    "cross-env": "^7.0.3",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.8.2"
   },
@@ -43,7 +44,6 @@
     "nodemailer": "^6.7.8",
     "socket.io": "^4.5.2",
     "stripe": "^11.6.0",
-    "uuid": "^9.0.0",
-    "yargs": "^17.6.2"
+    "uuid": "^9.0.0"
   }
 }
