@@ -19,6 +19,7 @@ import routerSeed from '../seed/seed.route';
 
 import { dbConnection } from '../database/config';
 import { socketsController } from '../sockets/socketsController';
+import { JwtStrategy } from '../helpers/auth/strategies/jwt.strategy';
 
 interface ServerToClientEvents {
   noArg: () => void;
@@ -102,6 +103,9 @@ class Server {
 
     //Sockets
     this.sockets();
+
+    //Auth strategy
+    this.authStrategy();
   }
   async conectarDB() {
     await dbConnection();
@@ -125,6 +129,10 @@ class Server {
         tempFileDir: '/tmp/',
       })
     );
+  }
+
+  authStrategy() {
+    new JwtStrategy();
   }
 
   routes() {
