@@ -1,5 +1,4 @@
 import express, { Application } from 'express';
-import path from 'path';
 import server from 'http';
 import io, { Socket } from 'socket.io';
 import morgan from 'morgan';
@@ -7,19 +6,13 @@ import cors from 'cors';
 import { v2 as cloudinary } from 'cloudinary';
 import fileUpload from 'express-fileupload';
 import Stripe from 'stripe';
-
-import routerUsers from '../routes/users';
-import routerAuth from '../routes/auth';
-import routerPetHouses from '../routes/petHouses';
-import routerCategorias from '../routes/categorias';
-import routerPets from '../routes/pets';
-import routerReservas from '../routes/reservas';
-import routerSubscriptions from '../routes/subscriptions';
-import routerSeed from '../seed/seed.route';
-
-import { dbConnection } from '../database/config';
+import { AppDataSource } from '../database/data-source';
 import { socketsController } from '../sockets/socketsController';
 import { JwtStrategy } from '../helpers/auth/strategies/jwt.strategy';
+
+import routerSeed from '../Seed/seed.routes';
+import { UserRoutes } from '../User/user.routes';
+import { PREFIX, paths } from '../config';
 
 interface ServerToClientEvents {
   noArg: () => void;
@@ -44,17 +37,8 @@ class Server {
   server: server.Server;
   io: any;
   port: string | number;
-  userPaths: string;
-  indexPath: string;
   cloudinary: any;
   stripe: any;
-  authPath: string;
-  petHousePath: string;
-  categoriaPath: string;
-  petsPath: string;
-  reservaPath: string;
-  subscriptionPath: string;
-  seedPath: string;
 
   constructor() {
     this.app = express();
@@ -66,16 +50,6 @@ class Server {
       InterServerEvents,
       SocketData
     >(this.server);
-
-    this.indexPath = '/api';
-    this.userPaths = '/api/usuarios';
-    this.authPath = '/api/auth';
-    this.petHousePath = '/api/pethouses';
-    this.categoriaPath = '/api/categorias';
-    this.petsPath = '/api/pets';
-    this.reservaPath = '/api/reserva';
-    this.subscriptionPath = '/api/subscription';
-    this.seedPath = '/api/seed';
 
     //Cloudinary config
     this.cloudinary = cloudinary.config({
@@ -108,7 +82,13 @@ class Server {
     this.authStrategy();
   }
   async conectarDB() {
-    await dbConnection();
+    try {
+      //await dbConnection(); //MongoDB
+      await AppDataSource.initialize(); //Postgres
+      console.log('Postgres database connected!');
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   middlewares() {
@@ -136,12 +116,11 @@ class Server {
   }
 
   routes() {
-    this.app.get(this.indexPath, (_, res) => {
-      // '_' para ignorar los parametros no usados
+    this.app.get(PREFIX, (_, res) => {
       res.json({ msg: 're-pets api - conected' });
     });
 
-    this.app.post(`${this.indexPath}/payment-intent`, async (req, res) => {
+    this.app.post(`${PREFIX}/payment-intent`, async (req, res) => {
       try {
         console.log(req.body);
         const { amount, currency } = req.body;
@@ -163,15 +142,9 @@ class Server {
         });
       }
     });
-
-    this.app.use(this.userPaths, routerUsers);
-    this.app.use(this.authPath, routerAuth);
-    this.app.use(this.petHousePath, routerPetHouses);
-    this.app.use(this.categoriaPath, routerCategorias);
-    this.app.use(this.petsPath, routerPets);
-    this.app.use(this.reservaPath, routerReservas);
-    this.app.use(this.subscriptionPath, routerSubscriptions);
-    this.app.use(this.seedPath, routerSeed);
+    //--------------------------------------------
+    this.app.use(`${paths.USER}`, new UserRoutes().routes);
+    this.app.use(`${paths.SEED}`, routerSeed);
   }
 
   sockets() {

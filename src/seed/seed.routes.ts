@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { SeedController } from './seed.controller';
 import { SeedService } from './seed.service';
+
 import passport from 'passport';
 
 const router = Router();
