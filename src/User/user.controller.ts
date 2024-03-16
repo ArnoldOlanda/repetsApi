@@ -7,8 +7,7 @@ export class UserController {
 
   public createUser = async (req: Request, res: Response) => {
     try {
-      const userDto = req.body as CreateUserDto;
-      const data = await this.userService.createUser(userDto);
+      const data = await this.userService.createUser(req.body);
       const { user, verifyCode } = data;
       return res.json({ user, verifyCode });
     } catch (error) {

@@ -4,6 +4,8 @@ import { UserService } from './user.service';
 import { User } from './user.entity';
 import { UserController } from './user.controller';
 import { Repository } from 'typeorm';
+import { validateFields } from '../middlewares/validateFields';
+import { CreateUserDto } from './dto/createUser.dto';
 
 export class UserRoutes {
   constructor(
@@ -18,7 +20,11 @@ export class UserRoutes {
   ) {}
 
   get routes() {
-    this.router.post('/register', this.userController.createUser);
+    this.router.post(
+      '/register',
+      validateFields(CreateUserDto),
+      this.userController.createUser
+    );
     return this.router;
   }
 }
